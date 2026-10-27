@@ -6,7 +6,7 @@
 - pnpm audit ve tüm 7 .NET projesinin transitif NuGet taraması: bilinen zafiyet bildirmedi (bu tarihteki registry verisi).
 - Ajan regresyonları: HTTPS origin sınırı, 404 fallback, 401/503 fail-closed, 429 Retry-After, kalıcı DPAPI journal tutarlılığı; önceki kayıp cevap/yeniden başlatma/tekrar yürütmeme ve katalog sınırı testleri dahil.
 - Audit güvenlik regresyonu: Admin farklı domain veya eski scope'suz kayıtları okuyamaz; yeni login audit'inin domain'i kaydedilir.
-- Statik tanıtım: 1440px masaüstü, 390/768px mobil, görseller, anchor gezinme, taşma ve JS hata kontrolleri geçti. Görseller sentetik example.invalid oturumudur. GitHub Pages yayını tamamlandı ve canlı görünüm tarayıcıda doğrulandı; kurulum linkleri release yayınından sonra ayrıca kontrol edilecektir.
+- Statik tanıtım: 1440px masaüstü, 390/768px mobil, görseller, anchor gezinme, taşma ve JS hata kontrolleri geçti. Görseller sentetik example.invalid oturumudur. GitHub Pages yayını tamamlandı ve canlı görünüm tarayıcıda doğrulandı; kurulum linkleri HTTP 200 ve manifest/digest eşleşmesiyle doğrulandı.
 - Sunucu EXE gömülü yükü: 197 kayıt, gerekli API/kurulum/şema dosyaları mevcut; runtime sır dosyası veya kök dışı yol bulunmadı. EXE çalıştırılıp işletim sistemine kurulum yapılmadı.
 - Codex Security yeni başlatma denemesi PostgreSQL test aracı içindeki uzun dosya yolunu inceleyemedi; scanId veya tamamlanmış rapor oluşmadı. Bu çalışma tam tarama tamamlandı iddiası içermez.
 
@@ -275,3 +275,11 @@ Kaynak incelemesiyle docs/ad-acceptance.md eklendi. Kısa adın UPN'e çevrilmes
 Yerel demo http://127.0.0.1:5080 üzerinde health=alive ve ready=ready ile doğrulandı. Son kaynak derlemesi 141/141 .NET, 6 servis ve 12 bağlantı önkontrolüyle başarılı. Son Chromium çalışması 5/5 geçti. Gerçek yerel phi4-mini:latest sentetik teşhisi completed oldu; OS onarımı çalıştırılmadı. LDAP groupType rol kontrolünün 12 yerel regresyonu bu .NET toplamına dahildir; gerçek AD testinin yerine geçmez. Açılış/yeniden başlatma ve test sırası docs/local-testing.md içinde. Mevcut .data/sırlar dağıtım paketinde yoktur.
 
 
+
+## GitHub yayını — 27 Ekim 2026
+
+Tanıtım: https://berkayatag.github.io/Windows-Failure-Intelligence/
+Kaynak: https://github.com/BerkayAtag/Windows-Failure-Intelligence
+Paketler: https://github.com/BerkayAtag/Windows-Failure-Intelligence/releases/tag/v0.6.0-preview.2
+
+GitHub Actions temiz Windows ortamında kurulum paketlerini üretti ve yayımladı. Sunucu EXE, ajan EXE, pilot ZIP ve SHA256SUMS.txt bağlantıları HTTP 200 döndü; üç paket için GitHub asset digest değerleri SHA256SUMS ile eşleşti. Bu kontrol gerçek Windows kurulumu veya Authenticode yayıncı doğrulaması değildir. İlk ayrı CI çalışmasındaki PowerShell cold-start timeout için sentetik testin iki işlemine ayrı 60 saniye bütçe verildi; üretim onarım timeout'u değişmedi.
