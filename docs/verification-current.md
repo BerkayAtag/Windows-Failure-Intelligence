@@ -283,3 +283,6 @@ Kaynak: https://github.com/BerkayAtag/Windows-Failure-Intelligence
 Paketler: https://github.com/BerkayAtag/Windows-Failure-Intelligence/releases/tag/v0.6.0-preview.2
 
 GitHub Actions temiz Windows ortamında kurulum paketlerini üretti ve yayımladı. Sunucu EXE, ajan EXE, pilot ZIP ve SHA256SUMS.txt bağlantıları HTTP 200 döndü; üç paket için GitHub asset digest değerleri SHA256SUMS ile eşleşti. Bu kontrol gerçek Windows kurulumu veya Authenticode yayıncı doğrulaması değildir. İlk ayrı CI çalışmasındaki PowerShell cold-start timeout için sentetik testin iki işlemine ayrı 60 saniye bütçe verildi; üretim onarım timeout'u değişmedi.
+
+Son GitHub doğrulaması başarılı: https://github.com/BerkayAtag/Windows-Failure-Intelligence/actions/runs/40496628234 . Temiz Windows ortamında Build, pnpm/NuGet kontrolleri, EF pending-model kontrolü ve tarayıcı testleri geçti. GitHub'dan indirilen iki EXE'nin gerçek dosya SHA256 değerleri de manifestle eşleşti; EXE'ler çalıştırılmadı.
+
