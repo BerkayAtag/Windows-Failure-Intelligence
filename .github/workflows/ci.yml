@@ -1,0 +1,43 @@
+name: WFI validation
+on: [push, pull_request]
+permissions:
+  contents: read
+jobs:
+  build-test:
+    runs-on: windows-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-dotnet@v4
+        with:
+          dotnet-version: '10.0.x'
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '24'
+      - uses: pnpm/action-setup@v4
+        with:
+          version: '11'
+      - run: ./scripts/Build.ps1
+        shell: pwsh
+      - run: pnpm audit --audit-level=low
+        working-directory: src/wfi-web
+      - run: dotnet list WFI.slnx package --vulnerable --include-transitive
+      - run: dotnet tool restore
+      - run: dotnet ef migrations has-pending-model-changes --project src/WFI.Infrastructure --startup-project src/WFI.Api
+      - run: pnpm exec playwright install chromium
+        working-directory: src/wfi-web
+      - name: Browser tests
+        shell: pwsh
+        run: |
+          $env:ASPNETCORE_ENVIRONMENT = 'Development'
+          $env:Demo__Enabled = 'true'
+          $server = Start-Process dotnet -ArgumentList 'run --no-build -c Release --project src/WFI.Api --urls http://127.0.0.1:5080' -PassThru -WindowStyle Hidden
+          try {
+            $ready = $false
+            for ($attempt = 0; $attempt -lt 30; $attempt++) {
+              try { Invoke-RestMethod http://127.0.0.1:5080/api/v1/health | Out-Null; $ready = $true; break } catch { Start-Sleep -Seconds 1 }
+            }
+            if (-not $ready) { throw 'API readiness timeout' }
+            Set-Location src/wfi-web
+            pnpm exec playwright test
+            if ($LASTEXITCODE -ne 0) { throw 'Browser tests failed' }
+          } finally { Stop-Process -Id $server.Id -ErrorAction SilentlyContinue }

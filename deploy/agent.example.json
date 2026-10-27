@@ -1,0 +1,9 @@
+{
+  "Agent": {
+    "ServerUrl": "https://wfi.example.invalid",
+    "DeviceId": "00000000-0000-0000-0000-000000000000",
+    "EnrollmentToken": "OBTAIN_ONE_TIME_TOKEN_FROM_ADMIN",
+    "PollSeconds": 30,
+    "StatePath": "C:/ProgramData/WFI/agent-state.bin"
+  }
+}

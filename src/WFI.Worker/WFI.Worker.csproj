@@ -1,0 +1,2 @@
+<Project Sdk="Microsoft.NET.Sdk.Worker"><PropertyGroup><OutputType>Exe</OutputType></PropertyGroup><ItemGroup><ProjectReference Include="../WFI.Infrastructure/WFI.Infrastructure.csproj"/><PackageReference Include="Microsoft.Extensions.Hosting" Version="10.0.13"/></ItemGroup><ItemGroup><Content Remove="**/*.local.json;.data/**"/><None Remove="**/*.local.json;.data/**"/></ItemGroup></Project>
+

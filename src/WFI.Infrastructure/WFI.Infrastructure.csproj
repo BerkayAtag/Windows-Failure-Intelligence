@@ -1,0 +1,5 @@
+<Project Sdk="Microsoft.NET.Sdk"><ItemGroup><PackageReference Include="OpenTelemetry.Extensions.Hosting" Version="1.20.1" /><PackageReference Include="OpenTelemetry.Exporter.OpenTelemetryProtocol" Version="1.20.1" /><PackageReference Include="Microsoft.EntityFrameworkCore.Design" Version="10.0.13">
+  <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
+  <PrivateAssets>all</PrivateAssets>
+</PackageReference><PackageReference Include="SQLitePCLRaw.bundle_e_sqlite3" Version="3.0.5" /><ProjectReference Include="../WFI.Core/WFI.Core.csproj" /><FrameworkReference Include="Microsoft.AspNetCore.App" /><PackageReference Include="Microsoft.EntityFrameworkCore.Sqlite" Version="10.0.13" /><PackageReference Include="Npgsql.EntityFrameworkCore.PostgreSQL" Version="10.0.1" /><PackageReference Include="System.DirectoryServices.Protocols" Version="10.0.13" /></ItemGroup></Project>
+

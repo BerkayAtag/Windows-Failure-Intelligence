@@ -1,0 +1,11 @@
+{
+  "generatedUtc": "2026-10-22T20:27:43.860582Z",
+  "rows": 40000,
+  "sequentialRequests": 60,
+  "concurrentUsers": 1,
+  "provider": "SQLite / in-process TestServer",
+  "p50Ms": 27.2814,
+  "p95Ms": 253.2926,
+  "maxMs": 280.7698,
+  "limitation": "Not a PostgreSQL, network, LDAP, upload, or 40000 concurrent-client benchmark."
+}

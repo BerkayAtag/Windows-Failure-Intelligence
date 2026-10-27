@@ -1,0 +1,17 @@
+**/bin/
+**/obj/
+**/node_modules/
+**/dist/
+.tools/
+.data/
+.env
+*.local.json
+*.user
+artifacts/
+**/distribution/
+**/TestResults/
+**/playwright-report/
+**/test-results/
+**/wwwroot/assets/
+**/wwwroot/index.html
+*.tsbuildinfo

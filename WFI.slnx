@@ -1,0 +1,13 @@
+<Solution>
+  <Folder Name="/src/">
+    <Project Path="src/WFI.Agent/WFI.Agent.csproj" />
+    <Project Path="src/WFI.Agent.Setup/WFI.Agent.Setup.csproj" />
+    <Project Path="src/WFI.Api/WFI.Api.csproj" />
+    <Project Path="src/WFI.Core/WFI.Core.csproj" />
+    <Project Path="src/WFI.Infrastructure/WFI.Infrastructure.csproj" />
+    <Project Path="src/WFI.Worker/WFI.Worker.csproj" />
+  </Folder>
+  <Folder Name="/tests/">
+    <Project Path="tests/WFI.Tests/WFI.Tests.csproj" />
+  </Folder>
+</Solution>
