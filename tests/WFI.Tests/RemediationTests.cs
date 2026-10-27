@@ -110,10 +110,13 @@ public class RemediationTests
     public async Task WindowsRunnerActuallyExecutesAndReportsExitCode()
     {
         if(!OperatingSystem.IsWindows())return;
-        var runner=new PowerShellRunner();using var ct=new CancellationTokenSource(TimeSpan.FromSeconds(15));
+        // Hosted Windows runners can cold-start PowerShell slowly. Each independent
+        // invocation gets a bounded budget; production remediation deadlines are unchanged.
+        var runner=new PowerShellRunner();using var ct=new CancellationTokenSource(TimeSpan.FromSeconds(60));
         var result=await runner.RunAsync("Write-Output 'WFI_SYNTHETIC_EXECUTION'",ct.Token);
         Assert.Equal(0,result.ExitCode);Assert.Contains("WFI_SYNTHETIC_EXECUTION",result.Output);
-        Assert.NotEqual(0,(await runner.RunAsync("throw 'synthetic failure'",ct.Token)).ExitCode);
+        using var failureCt=new CancellationTokenSource(TimeSpan.FromSeconds(60));
+        Assert.NotEqual(0,(await runner.RunAsync("throw 'synthetic failure'",failureCt.Token)).ExitCode);
     }
     [Fact]
     public async Task AgentCycleEnrollsCollectsExecutesAndPersistsReceiptWithoutRepeating()

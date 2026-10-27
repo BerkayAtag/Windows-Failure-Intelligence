@@ -3,10 +3,11 @@
 - Build.ps1 geçti: 213/213 .NET testi, API/worker/ajan ve iki setup EXE üretildi.
 - Playwright: 12/12, proje dizininden çalıştırıldı. Kök dizinden ilk çalıştırma fixture yolunda başarısız oldu; doğru çalışma dizininde tam tekrar geçti.
 - PostgreSQL 17: 2/2, EF ve deploy/schema.sql yollarında domain audit migration ve mevcut concurrency kabulleri geçti.
-- pnpm audit: bilinen zafiyet bildirmedi (bu tarihteki registry verisi).
+- pnpm audit ve tüm 7 .NET projesinin transitif NuGet taraması: bilinen zafiyet bildirmedi (bu tarihteki registry verisi).
 - Ajan regresyonları: HTTPS origin sınırı, 404 fallback, 401/503 fail-closed, 429 Retry-After, kalıcı DPAPI journal tutarlılığı; önceki kayıp cevap/yeniden başlatma/tekrar yürütmeme ve katalog sınırı testleri dahil.
 - Audit güvenlik regresyonu: Admin farklı domain veya eski scope'suz kayıtları okuyamaz; yeni login audit'inin domain'i kaydedilir.
-- Statik tanıtım: 1440px masaüstü, 390/768px mobil, görseller, anchor gezinme, taşma ve JS hata kontrolleri geçti. Görseller sentetik example.invalid oturumudur. Kurulum linkleri release yayınından sonra ayrıca kontrol edilecektir.
+- Statik tanıtım: 1440px masaüstü, 390/768px mobil, görseller, anchor gezinme, taşma ve JS hata kontrolleri geçti. Görseller sentetik example.invalid oturumudur. GitHub Pages yayını tamamlandı ve canlı görünüm tarayıcıda doğrulandı; kurulum linkleri release yayınından sonra ayrıca kontrol edilecektir.
+- Sunucu EXE gömülü yükü: 197 kayıt, gerekli API/kurulum/şema dosyaları mevcut; runtime sır dosyası veya kök dışı yol bulunmadı. EXE çalıştırılıp işletim sistemine kurulum yapılmadı.
 - Codex Security yeni başlatma denemesi PostgreSQL test aracı içindeki uzun dosya yolunu inceleyemedi; scanId veya tamamlanmış rapor oluşmadı. Bu çalışma tam tarama tamamlandı iddiası içermez.
 
 Windows servis kurulumu bu geliştirme bilgisayarında gerçekleştirilmedi. Gerçek hedef Windows VM/AD/BigFix kabulü açık; başarılı yerel regresyon bunların yerine geçmez. Önceki on maddelik yol haritasındaki açık işler implementation-roadmap.md içinde korunur.
@@ -129,7 +130,8 @@ Yeni grid mobilde minimum içerik genişliğine taşarak sayfayı yatay genişle
 ## Codex Security sınırı
 
 Yeni Standard scan başlatma çağrısı şu hata ile döndü:
-Could not read local file: src\WFI.Api\obj\Release\net10.0\compressed\gq2uzga5lf-{0}-4nhv88d8nh-4nhv88d8nh.gz
+Could not read local file: src\WFI.Api\obj\Release
+et10.0\compressed\gq2uzga5lf-{0}-4nhv88d8nh-4nhv88d8nh.gz
 
 Geçerli yeni scanId/scanDir dönmedi. Eklentinin desktop-scan talimatı gereği uydurma tarama veya terminalden ikame rapor üretilmedi. Yeni tam tarama tamamlanmadı. Yerel testler yeni Codex Security raporu olarak sunulmaz. v0.2 taraması 0.3.0 kaynağını kapsamıyor.
 

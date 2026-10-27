@@ -35,11 +35,11 @@ Demo çalışırken ayrı PowerShell'de `scripts/Test-OllamaPipeline.ps1` çalı
 
 ## Dosyalar ve paket sınırı
 
-`artifacts/WFI-0.6.0-preview.1-pilot.zip` (geliştirme önizlemesi): API, worker, Windows ajanı, deploy, scripts ve docs içerir. Kaynak checkout, test projeleri, yerel .data verileri ve sır içeren local.json dosyaları dağıtım paketine eklenmez. Start-Demo/Build/Test-Postgres gibi kaynak proje isteyen geliştirme betikleri checkout üzerinden çalıştırılır; yalnız ZIP açılmış klasörde kaynak varmış gibi çalıştırılmaz. Üretim paketi kurulumunda server-installation.md kullanılır.
+`artifacts/WFI-0.6.0-preview.2-pilot.zip` (geliştirme önizlemesi): API, worker, Windows ajanı, deploy, scripts ve docs içerir. Kaynak checkout, test projeleri, yerel .data verileri ve sır içeren local.json dosyaları dağıtım paketine eklenmez. Start-Demo/Build/Test-Postgres gibi kaynak proje isteyen geliştirme betikleri checkout üzerinden çalıştırılır; yalnız ZIP açılmış klasörde kaynak varmış gibi çalıştırılmaz. Üretim paketi kurulumunda server-installation.md kullanılır.
 
 Güncel test kapsamı ve açık kabul maddeleri verification-current.md; sürüm geçmişi kökte history-release.md içindedir. Gerçek AD/HA, OS onarımı, 40.000 aktif ajan ve yeni tam güvenlik taraması kabulü henüz tamamlanmamıştır.
 
-## 0.4.1 test akışı
+## Tarihsel 0.4.1 test akışı (güncel kurulum için yukarıdaki EXE akışını kullanın)
 
 Ana kapsam etiketi Genel olmalıdır. Cihazlar ve AI → Ajan setup indir bağlantısı Admin rolüyle ZIP döndürür. Pencereli kurulum gerçek HTTPS + WFI Admin oturumu ister; loopback HTTP demo bunu atlamaz. Yerel sentetik test, SetupRegistration → kayıt → enrollment → online akışını TestServer üzerinde doğrular; gerçek Windows servis kurulumu yapmaz.
 
