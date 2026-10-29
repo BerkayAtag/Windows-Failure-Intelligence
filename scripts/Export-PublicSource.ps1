@@ -19,7 +19,7 @@ try {
         $out=Join-Path $target $relative;New-Item -ItemType Directory -Force (Split-Path $out -Parent) | Out-Null
         if($extension -eq '.png'){Copy-Item -LiteralPath $relative -Destination $out;continue}
         $text=[IO.File]::ReadAllText((Join-Path $root $relative))
-        $text=$text.Replace('example.invalid','example.invalid').Replace('EXAMPLE.INVALID','EXAMPLE.INVALID').Replace('DC=example,DC=invalid','DC=example,DC=invalid')
+        $text=$text.Replace('example.invalid','example.invalid').Replace('EXAMPLE.INVALID','EXAMPLE.INVALID').Replace('DC=example,DC=invalid','DC=example,DC=invalid').Replace('EXAMPLE','EXAMPLE')
         $text=$text.Replace('C:\WFI-Source','C:\WFI-Source').Replace('C:/WFI-Source','C:/WFI-Source')
         $text=[regex]::Replace($text,'C:\\Users\\berka\\AppData\\Local\\Temp','C:\Temp')
         [IO.File]::WriteAllText($out,$text)

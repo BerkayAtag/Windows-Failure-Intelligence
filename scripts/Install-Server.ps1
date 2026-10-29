@@ -9,8 +9,11 @@ param(
     [string]$InstallPath='C:\Program Files\WFI Server'
 )
 $ErrorActionPreference='Stop'
+. (Join-Path $PSScriptRoot 'InstallerSupport.ps1')
+if(Test-Path 'HKLM:\SOFTWARE\Microsoft\Windows\CurrentVersion\Uninstall\WFI.Server'){throw 'WFI Server is already registered. Use the upgrade procedure.'}
 Import-Module WebAdministration -ErrorAction Stop
 $source=(Resolve-Path -LiteralPath $PackagePath).Path
+[void](Assert-WfiSafePath $source)
 $configFile=(Resolve-Path -LiteralPath $ConfigurationPath).Path
 $settings=Get-Content -LiteralPath $configFile -Raw | ConvertFrom-Json
 if($settings.Demo.Enabled -ne $false -or -not $settings.ConnectionStrings.Wfi -or -not $settings.Ldap.Server) { throw 'Production DB/LDAP configuration and Demo.Enabled=false are required.' }
@@ -35,6 +38,7 @@ foreach($path in @([string]$settings.Storage.Path,[string]$settings.DataProtecti
     $full=[IO.Path]::GetFullPath($path)
     if($full -eq $destination -or $full.StartsWith($destination.TrimEnd('\')+'\',[StringComparison]::OrdinalIgnoreCase)) { throw 'Data and keys must be outside the application directory.' }
 }
+Assert-WfiDistinctDirectories @($destination,[string]$settings.Storage.Path,[string]$settings.DataProtection.Path)
 New-Item -ItemType Directory -Path $destination | Out-Null
 $acl=Get-Acl -LiteralPath $destination
 $acl.SetAccessRuleProtection($true,$false)
@@ -45,6 +49,7 @@ foreach($sid in @('S-1-5-18','S-1-5-32-544')) {
 Set-Acl -LiteralPath $destination -AclObject $acl
 Copy-Item -Path (Join-Path $source 'api\*') -Destination $destination -Recurse -Force
 Copy-Item -LiteralPath $configFile -Destination (Join-Path $destination 'appsettings.local.json')
+foreach($file in @('InstallerSupport.ps1','Uninstall-Wfi.ps1')){Copy-Item -LiteralPath (Join-Path $PSScriptRoot $file) -Destination $destination}
 New-WebAppPool -Name $SiteName | Out-Null
 Set-ItemProperty "IIS:\AppPools\$SiteName" -Name managedRuntimeVersion -Value ''
 Set-ItemProperty "IIS:\AppPools\$SiteName" -Name startMode -Value AlwaysRunning
@@ -65,3 +70,5 @@ New-Website -Name $SiteName -PhysicalPath $destination -ApplicationPool $SiteNam
 $binding=Get-WebBinding -Name $SiteName -Protocol https
 $binding.AddSslCertificate($CertificateThumbprint,'My')
 Write-Host "Installed: https://$Hostname . Apply deploy/schema.sql using your DBA account before accepting traffic. Check /api/v1/ready. No production migration was run."
+
+Register-WfiInstallation 'Server' $destination $SiteName

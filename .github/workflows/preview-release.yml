@@ -30,18 +30,18 @@ jobs:
         shell: pwsh
         run: |
           ./scripts/Package.ps1
-          Copy-Item artifacts/api/distribution/WFI-Agent-Setup.exe artifacts/WFI-Agent-Setup.exe
-          $paths=@('artifacts/WFI-Server-Setup.exe','artifacts/WFI-Agent-Setup.exe','artifacts/WFI-0.6.0-preview.2-pilot.zip')
+
+          $paths=@('artifacts/WFI-Server-Setup.exe','artifacts/WFI-0.6.0-preview.3-pilot.zip')
           $paths | ForEach-Object { $hash=Get-FileHash -LiteralPath $_ -Algorithm SHA256; "$($hash.Hash.ToLowerInvariant())  $(Split-Path $_ -Leaf)" } | Set-Content artifacts/SHA256SUMS.txt
       - name: Publish development preview
         shell: pwsh
         env:
           GH_TOKEN: ${{ github.token }}
         run: |
-          gh release view v0.6.0-preview.2 --json tagName *> $null
+          gh release view v0.6.0-preview.3 --json tagName *> $null
           if($LASTEXITCODE -ne 0) {
-            gh release create v0.6.0-preview.2 --target '${{ github.sha }}' --prerelease --title 'WFI 0.6.0-preview.2' --notes-file docs/release-preview.md
+            gh release create v0.6.0-preview.3 --target '${{ github.sha }}' --prerelease --title 'WFI 0.6.0-preview.3' --notes-file docs/release-preview.md
             if($LASTEXITCODE -ne 0){throw 'Release creation failed'}
           }
-          gh release upload v0.6.0-preview.2 artifacts/WFI-Server-Setup.exe artifacts/WFI-Agent-Setup.exe artifacts/WFI-0.6.0-preview.2-pilot.zip artifacts/SHA256SUMS.txt --clobber
+          gh release upload v0.6.0-preview.3 artifacts/WFI-Server-Setup.exe artifacts/WFI-0.6.0-preview.3-pilot.zip artifacts/SHA256SUMS.txt --clobber
           if($LASTEXITCODE -ne 0){throw 'Release upload failed'}

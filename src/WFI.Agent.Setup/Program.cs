@@ -71,7 +71,7 @@ internal sealed class SetupForm:Form
     bool running;
     public SetupForm()
     {
-        Text="WFI Ajan Kurulumu";ClientSize=new Size(570,410);MinimumSize=new Size(590,450);StartPosition=FormStartPosition.CenterScreen;
+        Icon=Icon.ExtractAssociatedIcon(Application.ExecutablePath); BackColor=Color.White; install.BackColor=Color.FromArgb(201,0,22); install.ForeColor=Color.White; install.FlatStyle=FlatStyle.Flat; Text="WFI Ajan Kurulumu";ClientSize=new Size(570,410);MinimumSize=new Size(590,450);StartPosition=FormStartPosition.CenterScreen;
         var layout=new TableLayoutPanel{Dock=DockStyle.Fill,Padding=new Padding(24),ColumnCount=1,AutoScroll=true};
         void Field(string title,Control control){layout.Controls.Add(new Label{Text=title,AutoSize=true});layout.Controls.Add(control);}
         layout.Controls.Add(new Label{Text="WFI • İstemci ajanı",Font=new Font(Font.FontFamily,18,FontStyle.Bold),AutoSize=true});

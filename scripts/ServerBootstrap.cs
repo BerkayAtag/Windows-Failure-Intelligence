@@ -8,6 +8,9 @@ using System.Security.AccessControl;
 using System.Security.Principal;
 using System.Windows.Forms;
 
+[assembly: AssemblyCompany("Berkay Atağ")]
+[assembly: AssemblyProduct("WFI")]
+[assembly: AssemblyFileVersion("0.6.0.3")]
 internal static class ServerBootstrap
 {
     [STAThread]

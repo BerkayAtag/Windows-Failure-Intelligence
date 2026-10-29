@@ -10,6 +10,7 @@ param(
     [Security.SecureString]$EnrollmentToken
 )
 $ErrorActionPreference = 'Stop'
+. (Join-Path $PSScriptRoot 'InstallerSupport.ps1')
 if ($ServerUrl.Scheme -ne 'https' -or $ServerUrl.UserInfo -or $ServerUrl.AbsolutePath -ne '/' -or $ServerUrl.Query -or $ServerUrl.Fragment) { throw 'HTTPS WFI server origin without path/query/fragment is required.' }
 if ($DeviceId -eq [guid]::Empty) { throw 'Register a device in WFI first.' }
 $source = (Resolve-Path -LiteralPath $PackagePath).Path
@@ -17,8 +18,11 @@ if (-not (Test-Path -LiteralPath (Join-Path $source 'WFI.Agent.exe'))) { throw '
 $destination = [IO.Path]::GetFullPath($InstallPath)
 if ($destination -eq [IO.Path]::GetPathRoot($destination) -or $destination -eq $env:windir) { throw 'Invalid installation directory.' }
 if ($destination.StartsWith($env:windir.TrimEnd('\')+'\',[StringComparison]::OrdinalIgnoreCase) -or $destination -eq $source -or $destination.StartsWith($source.TrimEnd('\')+'\',[StringComparison]::OrdinalIgnoreCase)) { throw 'Use a dedicated agent installation directory outside Windows and the source package.' }
-if ((Test-Path -LiteralPath $destination) -and (Get-ChildItem -LiteralPath $destination -Force | Select-Object -First 1) -and -not (Test-Path -LiteralPath (Join-Path $destination 'WFI.Agent.exe'))) { throw 'Destination is not empty and is not an existing WFI agent installation.' }
+if ((Test-Path -LiteralPath $destination) -and (Get-ChildItem -LiteralPath $destination -Force | Select-Object -First 1) -and -not (Test-Path -LiteralPath (Join-Path $destination 'WFI.Agent.exe')) -and -not (Test-WfiRetainedAgentInstallation $destination)) { throw 'Destination is not empty and is not an existing WFI agent installation.' }
+[void](Assert-WfiSafePath $source)
+[void](Assert-WfiSafePath $destination)
 $stateDirectory = Join-Path $env:ProgramData 'WFI'
+[void](Assert-WfiSafePath $stateDirectory)
 $configPath = Join-Path $destination 'appsettings.local.json'
 if (Test-Path -LiteralPath $configPath) {
     $previous = (Get-Content -LiteralPath $configPath -Raw | ConvertFrom-Json).Agent
@@ -79,3 +83,5 @@ else {
 }
 Start-Service -Name 'WFI Agent'
 Get-Service -Name 'WFI Agent'
+
+Register-WfiInstallation 'Agent' $destination

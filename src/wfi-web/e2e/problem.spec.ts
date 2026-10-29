@@ -12,7 +12,14 @@ test('problem-first diagnosis, BigFix, protected agent download and dark options
   await expect(page.getByText('Genel (BigFix dahil)', { exact: true })).toHaveCount(0);
   await page.getByLabel('Tema', { exact: true }).selectOption('dark');
   const colors = await page.getByLabel('Tema', { exact: true }).locator('option').evaluateAll(options => options.map(o => ({ color: getComputedStyle(o).color, bg: getComputedStyle(o).backgroundColor })));
-  for (const c of colors) { expect(c.color).toBe('rgb(241, 245, 249)'); expect(c.bg).toBe('rgb(24, 35, 52)'); }
+  const luminance = (rgb: string) => {
+    const values = rgb.match(/\d+/g)!.slice(0, 3).map(Number).map(v => { const s = v / 255; return s <= .04045 ? s / 12.92 : ((s + .055) / 1.055) ** 2.4; });
+    return values[0] * .2126 + values[1] * .7152 + values[2] * .0722;
+  };
+  for (const c of colors) {
+    const values = [luminance(c.color), luminance(c.bg)].sort((a,b) => a-b);
+    expect((values[1] + .05) / (values[0] + .05)).toBeGreaterThanOrEqual(4.5);
+  }
   await page.getByRole('button', { name: 'Ajan kurulumu ve cihazlar' }).click();
   const download = await page.request.get('/api/v1/distribution/agent');
   expect(download.status()).toBe(200); expect(download.headers()['content-type']).toContain('application/octet-stream');

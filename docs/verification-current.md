@@ -1,3 +1,17 @@
+# 0.6.0-preview.3 — 29 Ekim 2026
+
+- scripts/Build.ps1: 213/213 .NET testi; frontend, API, worker, istemci EXE ve sunucu EXE başarılı.
+- Playwright Chromium: 13/13. Yeni oturumun aydınlık varsayılanı, beyaz sidebar/kırmızı ana işlem, karanlık tercih kalıcılığı, seçeneklerin en az 4.5:1 kontrastı ve Onarım Otomasyonu gezinmesi doğrulandı. Önceki eski RGB beklentisi işlevsel kontrast kontrolüne dönüştürüldü.
+- Kurulum regresyonları: ürün/yayıncı kayıtları ve kayıt türleri, tırnaklı simge/kaldırıcı yolu, göreli/UNC/kök yol reddi, junction üst klasör reddi, iç içe veya aynı kanıt/anahtar dizini reddi; korunan ajan klasörünün geri yüklenmesi ve ilgisiz dosya reddi. Makine servisi ve HKLM değiştirilmedi.
+- İki EXE dosyasının CompanyName alanı Berkay Atağ, FileVersion 0.6.0.3 olarak okundu. Çok boyutlu kırmızı WFI ICO ve yönetici yükseltmesi isteyen kaldırıcı üretildi. Gerçek appwiz/kurulum/kaldırma Windows VM kabulü yapılmadı.
+- pnpm audit bilinen zafiyet bildirmedi. Tam Codex Security başlatma, .data PostgreSQL aracı içindeki uzun yolu okuyamadı; scanId/rapor üretmedi.
+- Tanıtım sitesi: 1440px masaüstü, 390/768px mobil; görüntüler, sayfa kimliği, anlamlı içerik, anchor gezinme, taşma ve sayfa hataları kontrol edildi. Aydınlık ve karanlık uygulama ekranları sentetik example.invalid oturumuyla yenilendi. Browser plugin not available; mevcut Playwright altyapısı kullanıldı.
+- UI akışı: giriş → varsayılan açık tema → demo → Onarım Otomasyonu → karanlık seçimi → yenileme → tercih korunur. Kullanıcı oturumu/onarım/ajan dağıtım ve diğer mevcut e2e akışları da geçti.
+- Tasarım kontrolü: mevcut bilgi mimarisi ve metin hiyerarşisi korundu; palet kırmızı-beyaz/koyu nötr yapıldı; simgeler aynı pulse ailesinde; mobil taşma yok; tanıtım gerçek sentetik ekranları kullanır. Bu bir marka resmiyet/onayı iddiası değildir.
+
+GitHub yayını ve indirilen paket bütünlüğü yayın sonrasında ayrıca kaydedilir. Gerçek AD/BigFix/HA/40k kapasitesi ve tüm olası hataların yokluğu iddia edilmez. Önceki açık yol haritası korunur.
+
+---
 # 0.6.0-preview.2 — 27 Ekim 2026
 
 - Build.ps1 geçti: 213/213 .NET testi, API/worker/ajan ve iki setup EXE üretildi.

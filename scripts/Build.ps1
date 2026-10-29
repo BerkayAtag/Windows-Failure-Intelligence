@@ -1,5 +1,7 @@
 $ErrorActionPreference = 'Stop'
 $projectRoot = Split-Path $PSScriptRoot -Parent
+& (Join-Path $PSScriptRoot 'Build-Branding.ps1')
+& (Join-Path $PSScriptRoot 'Test-InstallerMetadata.ps1')
 & (Join-Path $PSScriptRoot 'Test-AgentInstaller.ps1')
 & (Join-Path $PSScriptRoot 'Test-ConnectivityValidation.ps1')
 . (Join-Path $PSScriptRoot 'Resolve-Dotnet.ps1')
@@ -30,6 +32,8 @@ try {
     Copy-Item -LiteralPath docs/client-installation.md -Destination artifacts/agent/CLIENT-INSTALLATION.md -Force
     if (Get-ChildItem artifacts/agent -Recurse -File | Where-Object { $_.Name -like '*.local.json' }) { throw 'Ajan paketinde yerel ayar bulundu.' }
     New-Item -ItemType Directory -Force artifacts/api/distribution,src/WFI.Api/distribution | Out-Null
+    Copy-Item -LiteralPath scripts/InstallerSupport.ps1,scripts/Uninstall-Wfi.ps1,artifacts/branding/WFI-Uninstall.exe,artifacts/branding/wfi.ico -Destination artifacts/agent -Force
+    Copy-Item -LiteralPath artifacts/branding/WFI-Uninstall.exe,artifacts/branding/wfi.ico -Destination artifacts/api -Force
     Compress-Archive -Path artifacts/agent/* -DestinationPath artifacts/api/distribution/WFI-Agent.zip -Force
     Copy-Item -LiteralPath artifacts/api/distribution/WFI-Agent.zip -Destination src/WFI.Api/distribution/WFI-Agent.zip -Force
     $compiler=Join-Path $env:WINDIR 'Microsoft.NET/Framework64/v4.0.30319/csc.exe'
@@ -38,10 +42,10 @@ try {
     $payload=Join-Path $projectRoot 'artifacts/api/distribution/WFI-Agent.zip'
     $bootstrap=Join-Path $projectRoot 'scripts/AgentBootstrap.cs'
     $setupOutput=Join-Path $projectRoot 'artifacts/api/distribution/WFI-Agent-Setup.exe'
-    & $compiler '/nologo' '/target:winexe' '/platform:x64' '/optimize+' '/reference:System.IO.Compression.dll' '/reference:System.IO.Compression.FileSystem.dll' '/reference:System.Windows.Forms.dll' "/win32manifest:$manifest" "/resource:$payload,WfiPayload" "/out:$setupOutput" $bootstrap
+    & $compiler '/nologo' '/target:winexe' '/platform:x64' '/optimize+' '/reference:System.IO.Compression.dll' '/reference:System.IO.Compression.FileSystem.dll' '/reference:System.Windows.Forms.dll' "/win32manifest:$manifest" "/win32icon:$projectRoot/artifacts/branding/wfi.ico" "/resource:$payload,WfiPayload" "/out:$setupOutput" $bootstrap
     if($LASTEXITCODE -ne 0){throw 'Single-file agent setup build failed.'}
     $setupFile=Get-Item artifacts/api/distribution/WFI-Agent-Setup.exe
-    @{version='0.6.0-preview.2';size=$setupFile.Length;sha256=(Get-FileHash -LiteralPath $setupFile.FullName -Algorithm SHA256).Hash;platform='Windows x64';signed=$false} | ConvertTo-Json | Set-Content -LiteralPath artifacts/api/distribution/agent-manifest.json -Encoding utf8
+    @{version='0.6.0-preview.3';size=$setupFile.Length;sha256=(Get-FileHash -LiteralPath $setupFile.FullName -Algorithm SHA256).Hash;platform='Windows x64';signed=$false} | ConvertTo-Json | Set-Content -LiteralPath artifacts/api/distribution/agent-manifest.json -Encoding utf8
     Copy-Item -LiteralPath artifacts/api/distribution/WFI-Agent-Setup.exe,artifacts/api/distribution/agent-manifest.json -Destination src/WFI.Api/distribution -Force
 } finally { Pop-Location }
 

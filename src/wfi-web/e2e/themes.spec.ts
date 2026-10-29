@@ -21,3 +21,18 @@ test('themes persist on login and dashboard without mobile overflow', async ({ p
   }
   expect(errors).toEqual([]);
 });
+
+test('new sessions default to red and white light theme; automation label and dark contrast remain usable', async ({ page }) => {
+  await page.goto('/');
+  await expect(page.locator('html')).toHaveAttribute('data-theme', 'light');
+  await page.getByRole('button', { name: 'Demoyu aç' }).click();
+  await expect(page.getByRole('button', { name: 'Onarım Otomasyonu', exact: true })).toBeVisible();
+  await expect(page.locator('.sidebar')).toHaveCSS('background-color', 'rgb(255, 255, 255)');
+  await expect(page.locator('.primary').first()).toHaveCSS('background-color', 'rgb(201, 0, 22)');
+  await page.getByLabel('Tema', { exact: true }).selectOption('dark');
+  await page.reload();
+  await expect(page.locator('html')).toHaveAttribute('data-theme', 'dark');
+  await expect(page.getByLabel('Tema', { exact: true })).toHaveCSS('color', 'rgb(243, 243, 246)');
+  await page.getByRole('button', { name: 'Onarım Otomasyonu', exact: true }).click();
+  await expect(page.getByRole('heading', { name: 'Onarım Otomasyonu', exact: true })).toBeVisible();
+});

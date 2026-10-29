@@ -1,7 +1,7 @@
 import { test, expect } from '@playwright/test';
 test('campaign preview freezes targets and requires an explicit pilot confirmation', async ({ page }) => {
   await page.goto('/'); await page.getByRole('button', { name: 'Demoyu aç' }).click();
-  await expect(page.getByRole('button', { name: 'Onarım Kampanyaları', exact: true })).toBeVisible();
+  await expect(page.getByRole('button', { name: 'Onarım Otomasyonu', exact: true })).toBeVisible();
   const hostname = `campaign-ui-${Date.now()}`;
   const deviceId = await page.evaluate(async host => {
     const csrf = await (await fetch('/api/v1/auth/csrf')).json();
@@ -14,8 +14,8 @@ test('campaign preview freezes targets and requires an explicit pilot confirmati
     return device.id as string;
   }, hostname);
   try {
-    await page.getByRole('button', { name: 'Onarım Kampanyaları', exact: true }).click();
-    await page.getByLabel('Kampanya adı', { exact: true }).fill(hostname);
+    await page.getByRole('button', { name: 'Onarım Otomasyonu', exact: true }).click();
+    await page.getByLabel('Otomasyon adı', { exact: true }).fill(hostname);
     const books = await (await page.request.get('/api/v1/playbooks')).json();
     await page.getByRole('combobox', { name: 'Onaylı işlem', exact: true }).selectOption(books.find((b: { code: string }) => b.code === 'PB-DNS-FLUSH').id);
     const local = (date: Date) => new Date(date.getTime() - date.getTimezoneOffset() * 60000).toISOString().slice(0, 16);
@@ -24,7 +24,7 @@ test('campaign preview freezes targets and requires an explicit pilot confirmati
     await page.getByLabel('Cihaz ara', { exact: true }).fill(hostname);
     await page.getByRole('checkbox', { name: `Seç ${hostname}`, exact: true }).check();
     await page.getByRole('button', { name: 'Kapsamı önizle' }).click();
-    await expect(page.getByRole('heading', { name: 'Kampanya önizlemesi' })).toBeVisible();
+    await expect(page.getByRole('heading', { name: 'Otomasyon önizlemesi' })).toBeVisible();
     await page.getByRole('button', { name: 'Taslak oluştur', exact: true }).click();
     const campaign = page.locator('article').filter({ has: page.getByRole('heading', { name: hostname, exact: true }) });
     await expect(campaign).toContainText('Taslak');
@@ -32,7 +32,7 @@ test('campaign preview freezes targets and requires an explicit pilot confirmati
     await expect(campaign).toContainText('hedef kapsamını onaylıyor musunuz');
     await campaign.getByRole('button', { name: 'İşlemi onayla', exact: true }).click();
     await expect(campaign).toContainText('Pilot çalışıyor');
-    await campaign.getByRole('button', { name: 'Kampanyayı iptal et' }).click();
+    await campaign.getByRole('button', { name: 'Otomasyonyı iptal et' }).click();
     await campaign.getByRole('button', { name: 'İşlemi onayla', exact: true }).click();
     await expect(campaign).toContainText('İptal edildi');
   } finally {
