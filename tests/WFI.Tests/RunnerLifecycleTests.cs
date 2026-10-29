@@ -4,6 +4,9 @@ using WFI.Core;
 using Xunit;
 
 namespace WFI.Tests;
+[CollectionDefinition("Native process lifecycle", DisableParallelization = true)]
+public sealed class NativeProcessLifecycleCollection { }
+[Collection("Native process lifecycle")]
 public class RunnerLifecycleTests
 {
     private sealed class WaitUntilCancelled:PowerShellRunner
@@ -51,12 +54,15 @@ public class RunnerLifecycleTests
     {
         if(!OperatingSystem.IsWindows())return;
         var marker=Path.Combine(Path.GetTempPath(),"wfi-process-"+Guid.NewGuid().ToString("N")+".txt");
-        using var cancel=new CancellationTokenSource(TimeSpan.FromSeconds(15));
-        var task=new PowerShellRunner().RunAsync($"[IO.File]::WriteAllText('{marker.Replace("'","''")}', [string]$PID); Start-Sleep -Seconds 60",cancel.Token);
+        // Startup on a cold shared runner is separate from the cancellation deadline.
+        // Publish the PID atomically: file existence must mean a complete PID is readable.
+        var quoted=marker.Replace("'","''");
+        using var cancel=new CancellationTokenSource(TimeSpan.FromSeconds(90));
+        var task=new PowerShellRunner().RunAsync($"[IO.File]::WriteAllText('{quoted}.tmp', [string]$PID); [IO.File]::Move('{quoted}.tmp','{quoted}'); Start-Sleep -Seconds 120",cancel.Token);
         try
         {
-            var deadline=DateTime.UtcNow.AddSeconds(10);
-            while(!File.Exists(marker)&&DateTime.UtcNow<deadline&&!task.IsCompleted)await Task.Delay(50);
+            var startup=Stopwatch.StartNew();
+            while(!File.Exists(marker)&&startup.Elapsed<TimeSpan.FromSeconds(60)&&!task.IsCompleted)await Task.Delay(50);
             Assert.True(File.Exists(marker),"Synthetic shell did not start within the test window.");
             var pid=int.Parse(await File.ReadAllTextAsync(marker));
             using var process=Process.GetProcessById(pid);
@@ -68,14 +74,14 @@ public class RunnerLifecycleTests
         {
             cancel.Cancel();
             try{await task.WaitAsync(TimeSpan.FromSeconds(5));}catch(OperationCanceledException){}
-            File.Delete(marker);
+            File.Delete(marker);File.Delete(marker+".tmp");
         }
     }
     [Fact]
     public async Task LargeStdoutAndStderrAreDrainedButOnlyBoundedOutputIsRetained()
     {
         if(!OperatingSystem.IsWindows())return;
-        using var cancel=new CancellationTokenSource(TimeSpan.FromSeconds(15));
+        using var cancel=new CancellationTokenSource(TimeSpan.FromSeconds(60));
         var result=await new PowerShellRunner().RunAsync("[Console]::Out.Write(('x' * 100000)); [Console]::Error.Write(('y' * 100000))",cancel.Token);
         Assert.Equal(0,result.ExitCode);Assert.InRange(result.Output.Length,1,3601);
         Assert.Contains('x',result.Output);Assert.Contains('y',result.Output);

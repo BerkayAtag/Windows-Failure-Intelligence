@@ -1,5 +1,10 @@
 # 0.6.0-preview.6 — 29 Ekim 2026
 
+## 30 Ekim 2026 — CI süreç testi düzeltmesi
+
+GitHub'ın ayrı doğrulama işi, sentetik PowerShell'in 10 saniyede başlayacağı varsayımı nedeniyle başarısız oldu; aynı kaynakla paket derlemesi başarılıydı. Süreç testleri paralel CPU yükünden ayrıldı, PID işareti atomik yayımlanıyor ve soğuk başlangıç için ayrı süre tanındı. İptal sonrası sürecin çıkması için mevcut 5 saniyelik kabul korunuyor; üretim ajanı/onarım süreleri değiştirilmedi. Yayınlanan preview.6 uygulama kodu ve paketi değişmedi.
+
+
 PostgreSQL varsayılan 55432 portu Windows tarafından ayrılmış veya doluysa kurucu 35432–35531 aralığından uygun bir loopback portunu otomatik seçip yapılandırmaya kaydeder; ağdan DB erişimi açılmaz.
 
 Güncel kurulum sürümü **preview.6**. Önceki preview.4/5 kurucularını kullanmayın: Windows PowerShell 5.1'in standart girdi kodlaması SQL aktarımını bozabiliyordu. Kurucu artık SQL'i UTF-8 baytlarıyla gönderir. Gerçek PostgreSQL'de PowerShell 5.1 üzerinden ilk/tekrarlı rol-veritabanı hazırlığı, tam şema ve Türkçe metin roundtrip testi geçti. Kalıcı regresyon: `scripts/Test-ServerSqlTransport.ps1`; `Test-Postgres.ps1` bunu da çalıştırır. İnternet gereksinimi ve açık Windows VM kabul kapısı değişmedi.

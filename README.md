@@ -1,5 +1,10 @@
 # Windows Failure Intelligence
 
+## 30 Ekim 2026 — CI süreç testi düzeltmesi
+
+GitHub'ın ayrı doğrulama işi, sentetik PowerShell'in 10 saniyede başlayacağı varsayımı nedeniyle başarısız oldu; aynı kaynakla paket derlemesi başarılıydı. Süreç testleri paralel CPU yükünden ayrıldı, PID işareti atomik yayımlanıyor ve soğuk başlangıç için ayrı süre tanındı. İptal sonrası sürecin çıkması için mevcut 5 saniyelik kabul korunuyor; üretim ajanı/onarım süreleri değiştirilmedi. Yayınlanan preview.6 uygulama kodu ve paketi değişmedi.
+
+
 PostgreSQL varsayılan 55432 portu Windows tarafından ayrılmış veya doluysa kurucu 35432–35531 aralığından uygun bir loopback portunu otomatik seçip yapılandırmaya kaydeder; ağdan DB erişimi açılmaz.
 
 Önceki preview.4/5 kurucuları yerine preview.6 kullanın. Kurulum düzeltmesi: Windows PowerShell 5.1 altında SQL UTF-8 olarak okunur ve PostgreSQL istemci kodlaması UTF8 seçilir; Türkçe katalog metinleri korunur. DNS sorgusu başarısızsa sihirbaz makine adıyla açılır. Sunucunun DNS domain bilgisi varsa domain alanına otomatik alınır ve değiştirilebilir.
