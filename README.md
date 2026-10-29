@@ -1,5 +1,7 @@
 # Windows Failure Intelligence
 
+Kurulum düzeltmesi: Windows PowerShell 5.1 altında SQL UTF-8 olarak okunur ve PostgreSQL istemci kodlaması UTF8 seçilir; Türkçe katalog metinleri korunur. DNS sorgusu başarısızsa sihirbaz makine adıyla açılır. Sunucunun DNS domain bilgisi varsa domain alanına otomatik alınır ve değiştirilebilir.
+
 **0.6.0-preview.4 · Kırmızı-beyaz tasarım, karanlık tema ve Onarım Otomasyonu.**
 
 [Tanıtım sitesi](https://BerkayAtag.github.io/Windows-Failure-Intelligence/) · [Sunucu kurulumu](https://github.com/BerkayAtag/Windows-Failure-Intelligence/releases/tag/v0.6.0-preview.4) · [Kurulum](docs/server-installation.md) · [Firewall](docs/firewall-requirements.md)

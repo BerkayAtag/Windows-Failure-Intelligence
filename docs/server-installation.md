@@ -1,5 +1,7 @@
 # Sunucu kurulum rehberi
 
+Kurulum düzeltmesi: Windows PowerShell 5.1 altında SQL UTF-8 olarak okunur ve PostgreSQL istemci kodlaması UTF8 seçilir; Türkçe katalog metinleri korunur. DNS sorgusu başarısızsa sihirbaz makine adıyla açılır. Sunucunun DNS domain bilgisi varsa domain alanına otomatik alınır ve değiştirilebilir.
+
 ## Güncel kurulum — 0.6.0-preview.4
 
 Yeni, tek sunuculu pilotta `WFI-Server-Setup.exe` dosyasını yönetici olarak açın. **İleri → ayarları kontrol et → yönetici parolasını iki kez yaz → Kur → Bitir.** Varsayılan dizinler `C:\Program Files\WFI Server` ve `C:\ProgramData\WFI Server`; veritabanı/veri dizinini farklı yerel diske değiştirebilirsiniz. Mevcut veya başka uygulamaya ait dizinleri kullanmayın. İlk giriş kullanıcı adı **local:admin**; parola kurulumda belirlediğiniz en az 14 karakterli paroladır. Hazır veya paylaşılan bir yönetici parolası yoktur.

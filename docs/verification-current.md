@@ -1,5 +1,7 @@
 # 0.6.0-preview.4 — 29 Ekim 2026
 
+Kurulum düzeltmesi: Windows PowerShell 5.1 altında SQL UTF-8 olarak okunur ve PostgreSQL istemci kodlaması UTF8 seçilir; Türkçe katalog metinleri korunur. DNS sorgusu başarısızsa sihirbaz makine adıyla açılır. Sunucunun DNS domain bilgisi varsa domain alanına otomatik alınır ve değiştirilebilir.
+
 - .NET: **220/220** geçti. Yerel yönetici doğru/yanlış parola, açık hesap adı, LDAP kapalı davranışı, hatalı/aşırı iterasyonlu hash, CSRF zorunluluğu ve parola değişimi/devre dışı hesapta eski cookie reddi eklendi.
 - Playwright Chromium: **14/14** geçti. Yerel yönetici açıklaması, demo düğmesinin gizlenmesi, karanlık/mobil giriş ve önceki ajan/teşhis/onarım/tema akışları.
 - Gerçek PostgreSQL 17, ayrılmış geçici loopback cluster: **3/3** geçti. Önceki concurrency/migration/SQL kabullerine ek olarak kurucunun gerçek GRANT ifadeleriyle uygulama hesabının SELECT/DML yapabilmesi, CREATE TABLE ve CREATE DATABASE yapamaması doğrulandı. Cluster test sonrası durduruldu; Windows servisi kurulmadı.

@@ -99,6 +99,7 @@ try {
         $start.FileName=Join-Path $pg 'psql.exe';$start.Arguments='-X -w -h 127.0.0.1 -p 55432 -U wfi_owner -d '+$Database+' --set=ON_ERROR_STOP=1'
         $start.UseShellExecute=$false;$start.CreateNoWindow=$true;$start.RedirectStandardInput=$true;$start.RedirectStandardOutput=$true;$start.RedirectStandardError=$true
         $start.EnvironmentVariables['PGPASSWORD']=$state.OwnerPassword
+        $start.EnvironmentVariables['PGCLIENTENCODING']='UTF8'
         $start.EnvironmentVariables['PGOPTIONS']='-c statement_timeout=120000 -c lock_timeout=10000'
         $p=[Diagnostics.Process]::Start($start)
         try{$out=$p.StandardOutput.ReadToEndAsync();$err=$p.StandardError.ReadToEndAsync();$p.StandardInput.Write($Text);$p.StandardInput.Close();if(!$p.WaitForExit(130000)){$p.Kill();$p.WaitForExit();throw 'Database command timed out.'};if($p.ExitCode -ne 0){throw 'Database provisioning failed; credentials and SQL were suppressed.'}}
@@ -109,7 +110,7 @@ try {
         Sql 'postgres' ("SELECT 'CREATE ROLE wfi_app LOGIN' WHERE NOT EXISTS (SELECT FROM pg_roles WHERE rolname='wfi_app')\gexec`nALTER ROLE wfi_app WITH NOSUPERUSER NOCREATEDB NOCREATEROLE NOREPLICATION PASSWORD '"+$state.AppPassword+"';`nSELECT 'CREATE DATABASE wfi OWNER wfi_owner' WHERE NOT EXISTS (SELECT FROM pg_database WHERE datname='wfi')\gexec`n")
         $state.DatabaseReady=$true;$state | ConvertTo-Json | Set-Content $journal -Encoding UTF8
     }
-    if(!$state.SchemaReady){Sql 'wfi' (Get-Content (Join-Path $package 'deploy\schema.sql') -Raw);$state.SchemaReady=$true;$state | ConvertTo-Json | Set-Content $journal -Encoding UTF8}
+    if(!$state.SchemaReady){Sql 'wfi' (Get-Content (Join-Path $package 'deploy\schema.sql') -Raw -Encoding UTF8);$state.SchemaReady=$true;$state | ConvertTo-Json | Set-Content $journal -Encoding UTF8}
     Sql 'wfi' "REVOKE ALL ON DATABASE wfi FROM PUBLIC; GRANT CONNECT ON DATABASE wfi TO wfi_app; REVOKE CREATE ON SCHEMA public FROM PUBLIC; GRANT USAGE ON SCHEMA public TO wfi_app; GRANT SELECT,INSERT,UPDATE,DELETE ON ALL TABLES IN SCHEMA public TO wfi_app; GRANT USAGE,SELECT ON ALL SEQUENCES IN SCHEMA public TO wfi_app;"
     Status '4/7 - Preparing local AI service and downloading phi4-mini. Model download may take a long time.'
     $ollama=Join-Path $runtime 'ollama'

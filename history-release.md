@@ -1,5 +1,7 @@
 # 0.6.0-preview.4 — 29 Ekim 2026
 
+Kurulum düzeltmesi: Windows PowerShell 5.1 altında SQL UTF-8 olarak okunur ve PostgreSQL istemci kodlaması UTF8 seçilir; Türkçe katalog metinleri korunur. DNS sorgusu başarısızsa sihirbaz makine adıyla açılır. Sunucunun DNS domain bilgisi varsa domain alanına otomatik alınır ve değiştirilebilir.
+
 - Sunucu için grafik kurulum sihirbazı, otomatik bağımlılık hazırlığı, özel PostgreSQL/Ollama servisleri ve kurulum sırasında şema uygulama.
 - Kurulumda belirlenen yerel yönetici; LDAP sonradan etkinleştirilebilir. Yerel parola değişiminde oturum geçersizleştirme.
 - Hash ve Microsoft yayıncı doğrulaması, arşiv geçişi engeli, korunan kurulum günlüğü, ayrı veri dizini.

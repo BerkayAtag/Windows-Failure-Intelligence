@@ -13,8 +13,13 @@ $panel=New-Object Windows.Forms.Panel;$panel.SetBounds(30,195,620,300);$form.Con
 function Field([string]$label,[int]$y,[string]$value,[bool]$secret=$false){$l=New-Object Windows.Forms.Label;$l.Text=$label;$l.SetBounds(0,$y,205,25);$panel.Controls.Add($l);$t=New-Object Windows.Forms.TextBox;$t.SetBounds(210,$y,405,25);$t.Text=$value;$t.UseSystemPasswordChar=$secret;$panel.Controls.Add($t);return $t}
 $app=Field 'Uygulama dizini' 0 'C:\Program Files\WFI Server'
 $data=Field 'Veritabani / veri dizini' 40 'C:\ProgramData\WFI Server'
-$hostname=Field 'Sunucu DNS adi' 80 ([Net.Dns]::GetHostEntry($env:COMPUTERNAME).HostName)
-$domain=Field 'Istemci domain' 120 'example.invalid'
+$defaultHostname=$env:COMPUTERNAME
+try{$defaultHostname=[Net.Dns]::GetHostEntry($env:COMPUTERNAME).HostName}catch{# Offline DNS must not prevent the wizard opening.
+}
+$hostname=Field 'Sunucu DNS adi' 80 $defaultHostname
+$defaultDomain='example.invalid'
+try{$detectedDomain=[Net.NetworkInformation.IPGlobalProperties]::GetIPGlobalProperties().DomainName;if($detectedDomain){$defaultDomain=$detectedDomain}}catch{}
+$domain=Field 'Istemci domain' 120 $defaultDomain
 $password=Field 'Yonetici parolasi (14+)' 160 '' $true
 $confirm=Field 'Parola tekrar' 200 '' $true
 $cert=Field 'Sertifika izi (istege bagli)' 240 ''
