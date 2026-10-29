@@ -1,9 +1,191 @@
 <!doctype html>
-<html lang="tr"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><meta name="description" content="WFI: Windows uç noktalarında kanıta dayalı teşhis, yerel AI ve kontrollü onarım."><meta name="color-scheme" content="light"><title>WFI — Windows Failure Intelligence</title><link rel="stylesheet" href="style.css"><link rel="icon" type="image/svg+xml" href="assets/wfi.svg"></head>
-<body><a class="skip" href="#main">İçeriğe geç</a><header><a class="brand" href="#"><span aria-hidden="true">ϟ</span> WFI</a><nav aria-label="Ana menü"><a href="#ozellikler">Özellikler</a><a href="#mimari">Mimari</a><a href="#kurulum">Kurulum</a><a href="https://github.com/BerkayAtag/Windows-Failure-Intelligence">GitHub ↗</a></nav></header>
-<main id="main"><section class="hero"><div><p class="preview">Geliştirme önizlemesi · 0.6.0-preview.6</p><h1>Windows sorunlarını<br><em>kanıtla çözün.</em></h1><p class="lead">Yerel AI. Kontrollü onarım. Tek konsol.</p><p>Makineyi seçin, sorunu anlatın. WFI ajanı kanıtları toplasın; sunucudaki yapay zekâ bulguları değerlendirsin. Onarım, onaylı işlem kataloğu ve cihaz politikalarıyla yürüsün.</p><div class="actions"><a class="primary" href="https://github.com/BerkayAtag/Windows-Failure-Intelligence/releases/download/v0.6.0-preview.6/WFI-Server-Setup.exe">Sunucu kurulumunu indir <span>↓</span></a><a class="secondary" href="https://github.com/BerkayAtag/Windows-Failure-Intelligence">GitHub’da incele ↗</a></div><small>Üretim kabulü açık. Paketler henüz Authenticode imzalı değildir.</small></div><figure><img src="assets/console.png" alt="Sentetik verilerle WFI analiz merkezi; makine seçimi, sorun açıklaması ve teşhis kapsamı" width="1440" height="1000"><figcaption>Gerçek uygulama ekranı · sentetik tanıtım oturumu</figcaption></figure></section>
-<section id="ozellikler"><div class="section-head"><p>TEŞHİSTEN DOĞRULAMAYA</p><h2>Bir komuttan fazlası.<br>İzlenebilir bir süreç.</h2></div><div class="features"><article><b>01 / Kanıt</b><h3>Makineden doğrudan teşhis</h3><p>Windows olayları, servisler, BigFix ve SCCM bulguları. Log dosyası yüklemek ana akış için zorunlu değil.</p></article><article><b>02 / Değerlendirme</b><h3>Kurum içinde yapay zekâ</h3><p>Ollama sunucuda çalışır. Geçmiş doğrulanmış deneyimler bağlam sağlar; olumsuz geri bildirimler tekrar kullanımı engeller.</p></article><article><b>03 / Kontrol</b><h3>Sınırlı, onaylı onarım</h3><p>Keyfi AI komutu yürütülmez. Onarım Otomasyonu: pilot grupları, bakım aralıkları ve belirsiz sonuçta duraklatma desteklenir.</p></article></div></section>
-<section id="mimari"><div class="section-head"><p>KURUM İÇİ MİMARİ</p><h2>AI gücü sunucuda.<br>Kanıt, uç noktada.</h2></div><div class="flow" aria-label="Windows ajanı dışarı yönlü HTTPS ile WFI sunucusuna bağlanır. WFI, PostgreSQL ve yerel Ollama kullanır."><div><span>UÇ NOKTA</span><h3>Windows ajanı</h3><p>Kanıt toplama<br>Onaylı işlemler<br>Kalıcı sonuç günlüğü</p></div><strong class="arrow">HTTPS →</strong><div class="central"><span>KURUM SUNUCUSU</span><h3>WFI API + worker</h3><p>İş kuyruğu · Politika · Denetim</p><div class="services"><span>PostgreSQL</span><span>Ollama</span></div></div><strong class="arrow">← HTTPS</strong><div><span>OPERATÖR</span><h3>Web konsolu</h3><p>Yerel yönetici / LDAPS<br>Teşhis kanıtları<br>Kontrollü onay</p></div></div><p class="note">Ajan için inbound port gerekmez. GitHub Pages yalnız bu tanıtım sitesini sunar; şirket konsolu ve verileri GitHub üzerinde çalışmaz.</p></section>
-<section class="proof"><figure><img src="assets/health.png" alt="WFI Sistem Sağlığı ekranında iş kuyruğu ve model kapasitesi görünümü" width="1440" height="1000" loading="lazy"><figcaption>Sentetik ekran örneği; kapasite testi sonucu değildir.</figcaption></figure><div><p class="preview">Ölçülebilir işletim</p><h2>Durumu görün.<br>Sonucu doğrulayın.</h2><p>Sistem Sağlığı, bekleyen teşhisleri ve yapılandırılmış model kapasitesini gösterir. BigFix merkez raporu, yerel BESClient sonucundan ayrı izlenir.</p><p>Varsayılan kırmızı-beyaz aydınlık tema, sağ üstten karanlık tema, mobil görünüm, test sonuçları ve açık kabul maddeleri belgelenir. Gerçek AD/HA, Windows kurulum kabulü ve 40 bin aktif cihaz kapasitesi henüz doğrulanmış değildir.</p><a href="https://github.com/BerkayAtag/Windows-Failure-Intelligence/blob/main/docs/verification-current.md">Doğrulama kapsamını incele →</a></div></section>
-<section class="proof"><div><h2>Aydınlık varsayılan.<br>Karanlık, bir seçim uzakta.</h2><p>Kırmızı-beyaz WFI tasarımı günün ilk oturumunda sizi karşılar. Sağ üstteki tema seçimi karanlık görünümü açar ve tercihinizi hatırlar.</p><p>Onarım Otomasyonu; pilot, ayrı genişleme onayı ve bakım penceresiyle mevcut güvenlik sınırlarını korur.</p></div><figure><img src="assets/console-dark.png" width="1440" height="1000" alt="WFI kırmızı vurgulu karanlık tema, sentetik demo" loading="lazy"><figcaption>Karanlık görünüm · sentetik tanıtım oturumu</figcaption></figure></section><section id="kurulum"><div class="section-head"><p>İNDİRME VE KURULUM</p><h2>Önce pilot ortamınızda deneyin.</h2></div><div class="downloads"><article><h3>Sunucu kurulumu</h3><p>Yönetici yetkili, etkileşimli tek EXE. Programlar ve Özellikler kaydı, Berkay Atağ yayıncı adı ve kırmızı WFI simgesi. İleri → parola belirle → Kur → Bitir. IIS, .NET, PostgreSQL ve Ollama/model otomatik hazırlanır. İlk giriş local:admin; LDAP sonradan etkinleştirilebilir. İlk kurulum internetten birkaç GB indirir. Gerçek Windows VM kabulü henüz açık.</p><a class="primary" href="https://github.com/BerkayAtag/Windows-Failure-Intelligence/releases/download/v0.6.0-preview.6/WFI-Server-Setup.exe">Sunucu EXE ↓</a><a href="https://github.com/BerkayAtag/Windows-Failure-Intelligence/blob/main/docs/server-installation.md">Sunucu rehberi →</a></article><article><h3>Windows ajanı</h3><p>Tek EXE ve sessiz dağıtım seçenekleri. Cihaz kimliği ile sunucu adresi kurum konsolundan alınır. Yeni istemci ilk bağlantıda envantere yansır. Programlar ve Özellikler yayıncısı: Berkay Atağ; kırmızı WFI simgesi.</p><p><strong>Kurum konsolunda: Ajan ve Ağ Erişimleri → Windows ajanını indir</strong></p><a href="https://github.com/BerkayAtag/Windows-Failure-Intelligence/blob/main/docs/client-installation.md">İstemci rehberi →</a></article></div><div class="release-links"><a href="https://github.com/BerkayAtag/Windows-Failure-Intelligence/releases/tag/v0.6.0-preview.6">Tüm paketler ve SHA256 değerleri ↗</a><a href="https://github.com/BerkayAtag/Windows-Failure-Intelligence/blob/main/docs/firewall-requirements.md">Firewall gereksinimleri ↗</a></div></section></main>
-<footer><a class="brand" href="#">ϟ WFI</a><p>© 2026 Berkay Atağ · WFI</p><a href="https://github.com/BerkayAtag/Windows-Failure-Intelligence/blob/main/history-release.md">Sürüm geçmişi ↗</a></footer></body></html>
+<html lang="tr">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="description" content="WFI: Windows uç noktalarında kanıta dayalı teşhis, kurum içi yapay zekâ ve kontrollü onarım.">
+<meta name="color-scheme" content="light dark">
+<meta property="og:title" content="WFI — Windows Failure Intelligence">
+<meta property="og:description" content="Makineyi seçin, sorunu anlatın. Ajan kanıt toplar, sunucudaki yerel AI değerlendirir, onarım onaylı katalogla yürür.">
+<meta property="og:image" content="https://berkayatag.github.io/Windows-Failure-Intelligence/assets/console.png">
+<title>WFI — Windows Failure Intelligence</title>
+<link rel="icon" type="image/svg+xml" href="assets/wfi.svg">
+<link rel="stylesheet" href="style.css?v=0.7.0">
+<script>
+  // Varsayılan aydınlık tema; ziyaretçinin seçimi bu tarayıcıda hatırlanır.
+  // Sayfa boyanmadan önce uygulanır, böylece tema geçişinde yanıp sönme olmaz.
+  (function () {
+    var theme = 'light';
+    try { if (localStorage.getItem('wfi.site.theme') === 'dark') theme = 'dark'; } catch (e) {}
+    document.documentElement.setAttribute('data-theme', theme);
+  })();
+</script>
+</head>
+<body>
+<a class="skip" href="#main">İçeriğe geç</a>
+<header class="top">
+  <a class="brand" href="#"><img src="assets/wfi-logo.png" alt="" width="36" height="36"><span>WFI<small>Windows Failure Intelligence</small></span></a>
+  <nav aria-label="Ana menü">
+    <a href="#ozellikler">Özellikler</a>
+    <a href="#ekranlar">Ekranlar</a>
+    <a href="#mimari">Mimari</a>
+    <a href="#kurulum">Kurulum</a>
+    <a href="https://github.com/BerkayAtag/Windows-Failure-Intelligence">GitHub ↗</a>
+  </nav>
+  <button class="theme-toggle" id="theme-toggle" type="button" aria-pressed="false" aria-label="Karanlık temaya geç" title="Karanlık temaya geç">
+    <svg class="icon-moon" viewBox="0 0 24 24" width="18" height="18" aria-hidden="true"><path d="M20.5 14.6A8.5 8.5 0 0 1 9.4 3.5a8.5 8.5 0 1 0 11.1 11.1Z" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linejoin="round"/></svg>
+    <svg class="icon-sun" viewBox="0 0 24 24" width="18" height="18" aria-hidden="true"><circle cx="12" cy="12" r="4.2" fill="none" stroke="currentColor" stroke-width="1.8"/><path d="M12 2.5v2.2M12 19.3v2.2M4.6 4.6l1.6 1.6M17.8 17.8l1.6 1.6M2.5 12h2.2M19.3 12h2.2M4.6 19.4l1.6-1.6M17.8 6.2l1.6-1.6" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/></svg>
+  </button>
+</header>
+
+<main id="main">
+  <section class="hero">
+    <div class="hero-copy">
+      <p class="eyebrow" lang="en">Sürüm 0.7.0 · Windows Server x64</p>
+      <h1>Windows sorunlarını<br><em>kanıtla çözün.</em></h1>
+      <p class="lead">Makineyi seçin, sorunu anlatın. WFI ajanı kanıtları toplar, sunucudaki yerel yapay zekâ bulguları değerlendirir; onarım onaylı işlem kataloğu ve cihaz politikalarıyla yürür.</p>
+      <div class="actions">
+        <a class="button" href="https://github.com/BerkayAtag/Windows-Failure-Intelligence/releases/latest/download/WFI-Server-Setup.exe">Sunucu kurulumunu indir <span aria-hidden="true">↓</span></a>
+        <a class="link" href="https://github.com/BerkayAtag/Windows-Failure-Intelligence#readme">Belgeleri incele →</a>
+      </div>
+      <ul class="facts">
+        <li>İleri → Kur → Bitir</li>
+        <li>Ollama isteğe bağlı</li>
+        <li>Kurum içi AI</li>
+        <li>Açık · aydınlık ve karanlık tema</li>
+      </ul>
+    </div>
+    <figure class="hero-shot">
+      <img src="assets/console.png" data-light-src="assets/console.png" data-dark-src="assets/console-dark.png"
+           data-light-alt="WFI analiz merkezi, aydınlık tema: makine seçimi, sorun açıklaması ve teşhis kapsamı"
+           data-dark-alt="WFI analiz merkezi, karanlık tema: makine seçimi, sorun açıklaması ve teşhis kapsamı"
+           alt="WFI analiz merkezi, aydınlık tema: makine seçimi, sorun açıklaması ve teşhis kapsamı" width="1440" height="1000">
+      <figcaption data-light-text="Gerçek uygulama ekranı · aydınlık tema · sentetik demo verisi" data-dark-text="Gerçek uygulama ekranı · karanlık tema · sentetik demo verisi">Gerçek uygulama ekranı · aydınlık tema · sentetik demo verisi</figcaption>
+    </figure>
+  </section>
+
+  <section class="section" id="ozellikler">
+    <div class="section-head">
+      <p class="eyebrow">Teşhisten doğrulamaya</p>
+      <h2>Bir komuttan fazlası.<br><em>İzlenebilir bir süreç.</em></h2>
+    </div>
+    <div class="features">
+      <article><span class="num">01 / Kanıt</span><h3>Makineden doğrudan teşhis</h3><p>Windows olayları, servisler, BigFix ve SCCM bulguları ajan tarafından toplanır. Log dosyası yüklemek isteğe bağlıdır.</p></article>
+      <article><span class="num">02 / Değerlendirme</span><h3>Kurum içinde yapay zekâ</h3><p>Ollama sunucuda çalışır; veriler kurum dışına çıkmaz. Doğrulanmış geçmiş deneyimler bağlam sağlar, olumsuz geri bildirim tekrarı engeller.</p></article>
+      <article><span class="num">03 / Kontrol</span><h3>Sınırlı, onaylı onarım</h3><p>Serbest AI komutu çalıştırılmaz. Sabit katalog, önkontrol ve doğrulama; Onarım Otomasyonu pilot grubu, bakım aralığı ve belirsiz sonuçta duraklatma sunar.</p></article>
+      <article><span class="num">04 / Erişim</span><h3>Yerel yönetici veya AD</h3><p>Kurulumda belirlenen local:admin ile hemen başlayın. LDAPS ve Viewer / Analyst / Admin grup eşlemesi sonradan etkinleştirilir.</p></article>
+      <article><span class="num">05 / İşletim</span><h3>Sistem Sağlığı</h3><p>Bekleyen teşhisler, model kapasitesi ve BigFix merkez doğrulaması tek ekranda. Her işlem domain kapsamlı denetim kaydı bırakır.</p></article>
+      <article><span class="num">06 / Dağıtım</span><h3>Tek EXE ajan</h3><p>İstemci kurulumu konsoldan indirilir; Windows'un kendi PowerShell 5.1 ve .NET Framework'ü yeterlidir. Ajan için inbound port gerekmez.</p></article>
+    </div>
+  </section>
+
+  <section class="section" id="ekranlar">
+    <div class="section-head">
+      <p class="eyebrow">Ekranlar</p>
+      <h2>Aydınlık varsayılan.<br><em>Karanlık, bir tık uzakta.</em></h2>
+      <p class="muted">Sağ üstteki düğme bu sayfanın temasını değiştirir; ekran görüntüleri de seçtiğiniz temaya geçer.</p>
+    </div>
+    <div class="gallery">
+      <figure>
+        <img src="assets/health.png" data-light-src="assets/health.png" data-dark-src="assets/health-dark.png" alt="WFI Sistem Sağlığı: iş kuyruğu ve model kapasitesi" width="1440" height="1000" loading="lazy">
+        <figcaption>Sistem Sağlığı · iş kuyruğu ve model kapasitesi</figcaption>
+      </figure>
+      <figure>
+        <img src="assets/agents.png" data-light-src="assets/agents.png" data-dark-src="assets/agents-dark.png" alt="WFI Ajan ve Ağ Erişimleri: tek EXE ajan kurulumu" width="1440" height="1000" loading="lazy">
+        <figcaption>Ajan ve Ağ Erişimleri · tek EXE istemci kurulumu</figcaption>
+      </figure>
+      <figure>
+        <img src="assets/setup-wizard.png" alt="WFI sunucu kurulum sihirbazı: dizinler, DNS adı, domain, yönetici parolası ve Ollama seçeneği" width="736" height="679" loading="lazy">
+        <figcaption>Sunucu kurulumu · ayarlar ve Ollama seçimi</figcaption>
+      </figure>
+      <figure>
+        <img src="assets/login.png" data-light-src="assets/login.png" data-dark-src="assets/login-dark.png" alt="WFI giriş ekranı" width="1440" height="1000" loading="lazy">
+        <figcaption>Giriş · yerel yönetici veya Active Directory</figcaption>
+      </figure>
+    </div>
+  </section>
+
+  <section class="section" id="mimari">
+    <div class="section-head">
+      <p class="eyebrow">Kurum içi mimari</p>
+      <h2>AI gücü sunucuda.<br><em>Kanıt, uç noktada.</em></h2>
+    </div>
+    <div class="flow" aria-label="Windows ajanı dışarı yönlü HTTPS ile WFI sunucusuna bağlanır. WFI, PostgreSQL ve yerel Ollama kullanır.">
+      <div><span>Uç nokta</span><h3>Windows ajanı</h3><p>Kanıt toplama<br>Onaylı işlemler<br>Kalıcı sonuç günlüğü</p></div>
+      <strong class="arrow">HTTPS 443 →</strong>
+      <div class="central"><span>Kurum sunucusu</span><h3>WFI API + worker</h3><p>İş kuyruğu · Politika · Denetim</p><div class="services"><span>PostgreSQL</span><span>Ollama</span><span>IIS</span></div></div>
+      <strong class="arrow">← HTTPS 443</strong>
+      <div><span>Operatör</span><h3>Web konsolu</h3><p>Yerel yönetici / LDAPS<br>Teşhis kanıtları<br>Kontrollü onay</p></div>
+    </div>
+    <p class="note">PostgreSQL ve Ollama yalnız 127.0.0.1 üzerinde dinler. GitHub Pages yalnız bu tanıtım sayfasını sunar; şirket konsolu ve verileri GitHub'da çalışmaz.</p>
+  </section>
+
+  <section class="section" id="kurulum">
+    <div class="section-head">
+      <p class="eyebrow">İndirme ve kurulum</p>
+      <h2>Tıkla, kur.<br><em>Gerisini sihirbaz hazırlar.</em></h2>
+    </div>
+    <div class="install">
+      <ol class="steps">
+        <li><b>İndirin</b><span>WFI-Server-Setup.exe dosyasını Windows Server'a indirip yönetici olarak çalıştırın.</span></li>
+        <li><b>İleri</b><span>Dizinleri, DNS adını ve yönetici parolasını kontrol edin. Ollama makinede yoksa WFI kurar; varsa mevcut olanı kullanabilir veya AI'yı sonraya bırakabilirsiniz.</span></li>
+        <li><b>Kur</b><span>IIS, .NET 10 Hosting Bundle, PostgreSQL, HTTPS sertifikası, güvenlik duvarı kuralı ve şema otomatik hazırlanır.</span></li>
+        <li><b>Bitir</b><span>Konsolu açın, local:admin ve kurulum parolanızla giriş yapın. İstemci ajanını Ajan ve Ağ Erişimleri ekranından indirin.</span></li>
+      </ol>
+      <figure class="install-shot">
+        <img src="assets/setup-finish.png" alt="WFI sunucu kurulumu tamamlandı ekranı ve Konsolu aç bağlantısı" width="736" height="679" loading="lazy">
+      </figure>
+    </div>
+    <div class="downloads">
+      <a class="button" href="https://github.com/BerkayAtag/Windows-Failure-Intelligence/releases/latest/download/WFI-Server-Setup.exe">WFI-Server-Setup.exe <span aria-hidden="true">↓</span></a>
+      <a class="button secondary" href="https://github.com/BerkayAtag/Windows-Failure-Intelligence/releases/latest">Sürüm notları ve SHA256</a>
+      <a class="link" href="https://github.com/BerkayAtag/Windows-Failure-Intelligence/blob/main/docs/server-installation.md">Sunucu rehberi →</a>
+      <a class="link" href="https://github.com/BerkayAtag/Windows-Failure-Intelligence/blob/main/docs/firewall-requirements.md">Firewall gereksinimleri →</a>
+    </div>
+    <p class="note">İlk kurulum internetten bileşen ve model indirir (birkaç GB). EXE Authenticode imzalı değildir; yayıncı adı Programlar ve Özellikler kaydıdır. Gerçek AD/HA ve büyük filo kabulü kurumunuzun pilot ortamında yapılmalıdır.</p>
+  </section>
+</main>
+
+<footer>
+  <span>© 2026 Berkay Atağ · Windows Failure Intelligence (WFI)</span>
+  <a href="https://github.com/BerkayAtag/Windows-Failure-Intelligence">GitHub</a>
+  <a href="https://github.com/BerkayAtag/Windows-Failure-Intelligence/blob/main/SECURITY.md">Güvenlik</a>
+  <a href="https://github.com/BerkayAtag/Windows-Failure-Intelligence/blob/main/history-release.md">Sürüm geçmişi</a>
+</footer>
+<script>
+  (function () {
+    var root = document.documentElement;
+    var button = document.getElementById('theme-toggle');
+
+    function apply(theme) {
+      var dark = theme === 'dark';
+      root.setAttribute('data-theme', theme);
+      var label = dark ? 'Aydınlık temaya geç' : 'Karanlık temaya geç';
+      button.setAttribute('aria-pressed', String(dark));
+      button.setAttribute('aria-label', label);
+      button.setAttribute('title', label);
+
+      // Ekran görüntüleri ve açıklamaları seçilen temaya göre değişir.
+      var mode = dark ? 'dark' : 'light';
+      document.querySelectorAll('img[data-light-src]').forEach(function (img) {
+        var src = img.getAttribute('data-' + mode + '-src');
+        if (img.getAttribute('src') !== src) img.setAttribute('src', src);
+        var alt = img.getAttribute('data-' + mode + '-alt');
+        if (alt) img.setAttribute('alt', alt);
+      });
+      document.querySelectorAll('[data-light-text]').forEach(function (el) {
+        el.textContent = el.getAttribute('data-' + mode + '-text');
+      });
+    }
+
+    apply(root.getAttribute('data-theme') === 'dark' ? 'dark' : 'light');
+
+    button.addEventListener('click', function () {
+      var next = root.getAttribute('data-theme') === 'dark' ? 'light' : 'dark';
+      apply(next);
+      try { localStorage.setItem('wfi.site.theme', next); } catch (e) {}
+    });
+  })();
+</script>
+</body>
+</html>

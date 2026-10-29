@@ -1,4 +1,4 @@
-# No administrator rights, service changes, credentials or machine configuration required.
+﻿# No administrator rights, service changes, credentials or machine configuration required.
 $ErrorActionPreference = 'Stop'
 $tokens=$null; $parseErrors=$null
 $ast=[Management.Automation.Language.Parser]::ParseFile((Join-Path $PSScriptRoot 'Install-Agent.ps1'),[ref]$tokens,[ref]$parseErrors)

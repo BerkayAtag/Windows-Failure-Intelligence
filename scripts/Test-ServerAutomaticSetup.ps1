@@ -1,4 +1,4 @@
-$ErrorActionPreference='Stop'
+﻿$ErrorActionPreference='Stop'
 . (Join-Path $PSScriptRoot 'ServerSetupSupport.ps1')
 function Reject([scriptblock]$Action){$rejected=$false;try{& $Action}catch{$rejected=$true};if(!$rejected){throw 'Unsafe setup input was accepted.'}}
 $options=@{Hostname='wfi.synthetic.invalid';Domain='synthetic.invalid';InstallPath='C:\Wfi-Synthetic-App';DataPath='C:\Wfi-Synthetic-Data';PasswordHash=(New-WfiPasswordHash 'Synthetic-only-password!');CertificateThumbprint=''}
@@ -10,6 +10,14 @@ $options.DataPath='C:\Wfi-Synthetic-App\db';Reject {Assert-WfiSetupOptions $opti
 $options.DataPath='C:relative';Reject {Assert-WfiSetupOptions $options};$options.DataPath='C:\Wfi-Synthetic-Data'
 $options.DataPath='C:\Wfi[bad]';Reject {Assert-WfiSetupOptions $options};$options.DataPath='C:\Wfi-Synthetic-Data'
 $options.CertificateThumbprint='invalid';Reject {Assert-WfiSetupOptions $options};$options.CertificateThumbprint=''
+foreach($mode in @('Install','Existing','None')){$options.AiMode=$mode;Assert-WfiSetupOptions $options}
+$options.AiMode='Remote';Reject {Assert-WfiSetupOptions $options};$options.Remove('AiMode')
+if((Get-WfiAiMode $options) -ne 'Install'){throw 'Legacy option files must keep the dedicated AI installation.'}
+if(Test-WfiExistingOllama 'http://127.0.0.1:9'){throw 'A closed port was reported as an Ollama server.'}
+foreach($script in @('Setup-Server.ps1','Install-ServerAutomatic.ps1','ServerSetupSupport.ps1')){
+    $head=[IO.File]::ReadAllBytes((Join-Path $PSScriptRoot $script))[0..2]
+    if(($head -join ',') -ne '239,187,191'){throw "UTF-8 BOM required for Windows PowerShell Turkish text: $script"}
+}
 $options.PasswordHash='pbkdf2-sha256:1:AA==:AA==';Reject {Assert-WfiSetupOptions $options}
 $port=Get-WfiAvailablePostgresPort
 $listener=[Net.Sockets.TcpListener]::new([Net.IPAddress]::Loopback,$port)
@@ -32,7 +40,7 @@ try {
     }
     $specs=Get-Content (Join-Path $PSScriptRoot 'server-dependencies.json') -Raw | ConvertFrom-Json
     foreach($entry in $specs.PSObject.Properties){$s=$entry.Value;if(([uri]$s.url).Scheme -ne 'https' -or $s.hash -notmatch '^[a-fA-F0-9]{64}([a-fA-F0-9]{64})?$'){throw 'Unpinned dependency.'}}
-    Write-Host 'Automatic setup regressions passed: credentials, hostname/domain, paths, certificate, tampered dependency, archive traversal and script syntax. No services or registry changed.'
+    Write-Host 'Automatic setup regressions passed: credentials, AI mode, UTF-8 BOM, hostname/domain, paths, certificate, tampered dependency, archive traversal and script syntax. No services or registry changed.'
 }finally{
     if((Split-Path $root -Parent) -eq ([IO.Path]::GetTempPath()).TrimEnd('\') -and (Split-Path $root -Leaf).StartsWith('wfi-auto-test-')){Remove-Item -LiteralPath $root -Recurse -Force}
 }

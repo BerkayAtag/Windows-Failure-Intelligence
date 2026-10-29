@@ -1,3 +1,22 @@
+# 0.7.0 — 30 Ekim 2026
+
+- Sunucu kurulum sihirbazı: Türkçe arayüz (UTF-8 BOM), adım göstergesi, ilerleme çubuğu, İptal/Bitir ve **Konsolu aç** bağlantısı. Durum ve hata mesajları Türkçe.
+- Ollama seçimi: WFI için kur (yoksa varsayılan, `WFI.Ollama` 127.0.0.1:11435) / mevcut Ollama'yı kullan (127.0.0.1:11434 algılanırsa varsayılan) / şimdi kurma (5 GB boş alan yeterli). Devam ettirilen kurulum aynı AI seçimini ister; eski seçenek dosyaları "kur" olarak yorumlanır.
+- Kurulum yeniden denendiğinde ilk denemede oluşturulan HTTPS sertifikası yeniden kullanılır.
+- Hata: Kurucu ve kaldırıcı PowerShell'i `-ExecutionPolicy` vermeden başlatıyordu; Windows istemci varsayılanı *Restricted* iken betikler engellenebiliyordu. Artık yalnız süreç kapsamında Bypass kullanılır.
+- Hata: appwiz.cpl simgesi tırnaklı ve indeksli `DisplayIcon` değeri yüzünden görünmeyebiliyordu; tırnaksız `.ico` yolu yazılır. InstallDate, EstimatedSize, URLInfoAbout, HelpLink ve Comments eklendi. Yayıncı **Berkay Atağ**, sürüm 0.7.0.
+- Yeni kırmızı WFI logosu: yuvarlatılmış kırmızı karo, beyaz nabız çizgisi, şeffaf köşeler (16–256 px). EXE dosya özelliklerinde şirket, telif ve ürün adı.
+- İstemci ajan kurulumu Windows PowerShell 5.1 ile çalışır; PowerShell 7 ön koşulu kaldırıldı. Setup sunucu adresini makinenin DNS domain'inden önerir.
+- Hata: iptal edilmiş makine yeniden kaydedilemiyordu (409). Revoked veya süresi dolmuş hiç kullanılmamış kayıt aynı cihaz kimliğiyle yeniden token alır; online ajan ve taze bekleyen kayıt korunur.
+- Hata: iptal edilen cihazın bekleyen teşhisleri domain kuyruğunda kapasite tutuyordu. İptal artık bekleyen/çalışan teşhisleri kapatır ve başlamamış onarımları iptal eder (tek transaction, audit).
+- Güvenlik: başka domain onarım kaydı 404 döner; olay detayındaki AI özeti domain filtreli; manuel onarımda makine adı doğrulanır/normalize edilir.
+- Konsolun sessiz kurulum örneği sabit kurum adresi yerine konsolun gerçek HTTPS adresini gösterir.
+- Altbilgi: **© 2026 Berkay Atağ · Windows Failure Intelligence (WFI)** sunucu konsolunda (giriş ve çalışma alanı, tüm temalar), kurulum pencerelerinde ve tanıtım sayfasında.
+- Tanıtım sayfası: BerTool tarzı açık/karanlık tema düğmesi (tercih hatırlanır), temaya göre değişen güncel ekran görüntüleri, kurulum sihirbazı görselleri.
+- GitHub release yalnız sunucu kurulumunu ve SHA256SUMS.txt'yi içerir; istemci ajanı konsoldan indirilir. `releases/latest` bağlantısı kullanılır.
+- Paketleme hatası: `dotnet publish` çıktı klasörünü temizlemediği için eski web paketleri sunucu kurulumunda birikiyordu; ajan EXE'sinin ara ZIP'i de pakette ikinci kez taşınıyordu. Derleme artık yayın klasörlerini temizler ve ara ZIP'i siler; sunucu kurulumu yaklaşık 50 MB küçüldü.
+- Şema, migration ve port değişikliği yoktur.
+
 # 0.6.0-preview.6 — 29 Ekim 2026
 
 ## 30 Ekim 2026 — CI süreç testi düzeltmesi

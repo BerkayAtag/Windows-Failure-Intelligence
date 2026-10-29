@@ -9,6 +9,8 @@ test('agent hub exposes EXE, silent parameters and network rules in every theme'
   await expect(page.getByRole('heading', { name: 'Makinenizi WFI’ye bağlayın' })).toBeVisible();
   await expect(page.getByRole('link', { name: 'Windows ajanını indir' })).toHaveAttribute('href', '/api/v1/distribution/agent');
   await expect(page.locator('.install-command')).toContainText('--token-file');
+  // Over plain HTTP (local demo) the example uses a neutral placeholder, never a fixed organisation host.
+  await expect(page.locator('.install-command')).toContainText('--server https://wfi-sunucu.domain');
   for (const theme of ['standard', 'light', 'dark']) {
     await page.getByLabel('Tema', { exact: true }).selectOption(theme);
     await page.screenshot({ path: path.join(os.tmpdir(), `wfi-agent-hub-${theme}.png`), fullPage: true });

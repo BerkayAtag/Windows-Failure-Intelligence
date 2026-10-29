@@ -1,4 +1,4 @@
-$ErrorActionPreference='Stop'
+﻿$ErrorActionPreference='Stop'
 $projectRoot=Split-Path $PSScriptRoot -Parent
 $staging=Join-Path $projectRoot ('artifacts/server-setup-'+[guid]::NewGuid().ToString('N'))
 New-Item -ItemType Directory -Path $staging | Out-Null
@@ -13,7 +13,7 @@ $payload=Join-Path $projectRoot 'artifacts/WFI-Server-Payload.zip'
 Compress-Archive -Path (Join-Path $staging '*') -DestinationPath $payload -Force
 $compiler=Join-Path $env:WINDIR 'Microsoft.NET/Framework64/v4.0.30319/csc.exe'
 $output=Join-Path $projectRoot 'artifacts/WFI-Server-Setup.exe'
-& $compiler '/nologo' '/target:winexe' '/platform:x64' '/optimize+' '/reference:System.IO.Compression.dll' '/reference:System.IO.Compression.FileSystem.dll' '/reference:System.Windows.Forms.dll' "/win32manifest:$projectRoot/src/WFI.Agent.Setup/app.manifest" "/resource:$payload,WfiPayload" "/out:$output" "/win32icon:$projectRoot/artifacts/branding/wfi.ico" (Join-Path $PSScriptRoot 'ServerBootstrap.cs')
+& $compiler '/nologo' '/codepage:65001' '/target:winexe' '/platform:x64' '/optimize+' '/reference:System.IO.Compression.dll' '/reference:System.IO.Compression.FileSystem.dll' '/reference:System.Windows.Forms.dll' "/win32manifest:$projectRoot/src/WFI.Agent.Setup/app.manifest" "/resource:$payload,WfiPayload" "/out:$output" "/win32icon:$projectRoot/artifacts/branding/wfi.ico" (Join-Path $PSScriptRoot 'ServerBootstrap.cs')
 if($LASTEXITCODE -ne 0){throw 'Server bootstrap compilation failed.'}
 Get-FileHash -LiteralPath $output -Algorithm SHA256 | Select-Object Algorithm,Hash,Path
 # Only remove this invocation's verified staging child, using one shell.

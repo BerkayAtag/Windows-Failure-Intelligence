@@ -1,4 +1,4 @@
-#Requires -Version 7.0
+﻿#Requires -Version 7.0
 param(
     [Parameter(Mandatory)][string]$ServerUrl,
     [ValidateRange(1,60)][int]$TimeoutSeconds=10

@@ -1,3 +1,20 @@
+# 0.7.0 doğrulaması — 30 Ekim 2026
+
+Yerel geliştirme makinesinde (Windows 11, .NET 10 SDK) `scripts/Build.ps1` ve tarayıcı testleri:
+
+| Kontrol | Sonuç |
+|---|---|
+| .NET testleri (`dotnet test WFI.slnx -c Release`) | **222/222** geçti (2 yeni: cihaz yeniden kaydı ve iptal temizliği) |
+| Playwright (yalıtılmış Development/demo API'si, Chromium) | **15/15** geçti (yeni: altbilgi her temada ve mobilde; sessiz kurulum örneği sabit kurum adresi içermiyor) |
+| Kurulum betik regresyonları | Yükleyici metadata, otomatik kurulum (AI seçimi, UTF-8 BOM dahil), ajan önkontrol 6/6, bağlantı önkontrolü 12/12 |
+| Bağımlılık taraması | `dotnet list package --vulnerable --include-transitive`: tüm projelerde bilinen zafiyet yok; `pnpm audit --audit-level=low`: bilinen zafiyet yok |
+| EXE dosya bilgisi | WFI-Server-Setup.exe, WFI-Agent-Setup.exe, WFI-Uninstall.exe: CompanyName **Berkay Atağ**, FileVersion 0.7.0.0, telif © 2026 Berkay Atağ |
+| Sunucu paketi | Gömülü `Setup-Server.ps1` UTF-8 BOM ile; eski web paketleri ve ajan ara ZIP'i yok; boyut ~82 MB (önceki ~140 MB) |
+| Kurulum sihirbazı | Yönetici gerektirmeyen önizleme kopyasıyla üç adım ekranı çizildi (Türkçe metin, ilerleme, Ollama algılama); kurulum çalıştırılmadı |
+| Tanıtım sayfası | Yerel statik sunucuda 1440 px ve 375 px; açık/karanlık düğmesi, tercih kaydı, temaya göre görsel değişimi, kırık görsel yok, yatay taşma yok |
+
+Ölçülmeyenler: gerçek Windows Server VM'de yönetici olarak uçtan uca kurulum, appwiz.cpl'de simge/yayıncı görünümü, kaldırma; gerçek AD/LDAPS, BigFix, PostgreSQL HA ve 40.000 cihaz kapasitesi. Yerel SQLite sonuçları PostgreSQL kapasite sonucu değildir. Bu sonuçlar sıfır hata iddiası değildir.
+
 # 0.6.0-preview.6 — 29 Ekim 2026
 
 ## 30 Ekim 2026 — CI süreç testi düzeltmesi

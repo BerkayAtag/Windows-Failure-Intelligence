@@ -1,5 +1,5 @@
-#Requires -RunAsAdministrator
-#Requires -Version 7.0
+﻿#Requires -RunAsAdministrator
+#Requires -Version 5.1
 param(
     [Parameter(Mandatory)][string]$PackagePath,
     [Parameter(Mandatory)][uri]$ServerUrl,
@@ -66,14 +66,16 @@ if ($service) {
     Assert-WfiServiceUpgrade $instance $destination
 }
 $secureToken = if($PSBoundParameters.ContainsKey('EnrollmentToken')){$EnrollmentToken}else{Read-Host 'One-time enrollment token (hidden; reuse state on upgrades)' -AsSecureString}
-$token = ConvertFrom-SecureString $secureToken -AsPlainText
+# Windows PowerShell 5.1 has no ConvertFrom-SecureString -AsPlainText; free the BSTR immediately.
+$bstr = [Runtime.InteropServices.Marshal]::SecureStringToBSTR($secureToken)
+try { $token = [Runtime.InteropServices.Marshal]::PtrToStringBSTR($bstr) } finally { [Runtime.InteropServices.Marshal]::ZeroFreeBSTR($bstr) }
 if (-not (Test-Path -LiteralPath (Join-Path $stateDirectory 'agent-state.bin')) -and $token -notmatch '^[0-9a-fA-F]{64}$') { throw 'A new installation requires a valid enrollment token.' }
 if ($service) { Stop-Service -Name 'WFI Agent' -ErrorAction Stop }
 Protect-WfiDirectory $destination
 Protect-WfiDirectory $stateDirectory
 Copy-Item -Path (Join-Path $source '*') -Destination $destination -Recurse -Force
 $settings = @{ Agent = @{ BigFixReinstallSha256=$BigFixReinstallSha256; ServerUrl=$ServerUrl.AbsoluteUri.TrimEnd('/'); DeviceId=$DeviceId.ToString(); EnrollmentToken=$token; PollSeconds=$PollSeconds; StatePath=(Join-Path $stateDirectory 'agent-state.bin') } }
-$settings | ConvertTo-Json -Depth 5 | Set-Content -LiteralPath (Join-Path $destination 'appsettings.local.json') -Encoding utf8
+[IO.File]::WriteAllText((Join-Path $destination 'appsettings.local.json'),($settings | ConvertTo-Json -Depth 5),[Text.UTF8Encoding]::new($false))
 $token = $null; $settings = $null
 $binary = '"' + (Join-Path $destination 'WFI.Agent.exe') + '"'
 if (-not $service) { New-Service -Name 'WFI Agent' -BinaryPathName $binary -DisplayName 'WFI Agent' -StartupType Automatic | Out-Null }

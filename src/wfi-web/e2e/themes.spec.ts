@@ -36,3 +36,18 @@ test('new sessions default to red and white light theme; automation label and da
   await page.getByRole('button', { name: 'Onarım Otomasyonu', exact: true }).click();
   await expect(page.getByRole('heading', { name: 'Onarım Otomasyonu', exact: true })).toBeVisible();
 });
+
+test('copyright footer is shown on login and workspace in every theme', async ({ page }) => {
+  const footer = '© 2026 Berkay Atağ · Windows Failure Intelligence (WFI)';
+  await page.goto('/');
+  await expect(page.getByText(footer, { exact: true })).toBeVisible();
+  await page.getByRole('button', { name: 'Demoyu aç' }).click();
+  for (const theme of ['light', 'dark', 'standard']) {
+    await page.getByLabel('Tema', { exact: true }).selectOption(theme);
+    await expect(page.locator('.workspace .app-footer')).toHaveText(footer);
+  }
+  await page.setViewportSize({ width: 390, height: 844 });
+  await page.locator('.workspace .app-footer').scrollIntoViewIfNeeded();
+  await expect(page.locator('.workspace .app-footer')).toBeVisible();
+  expect(await page.evaluate(() => document.documentElement.scrollWidth <= innerWidth)).toBe(true);
+});

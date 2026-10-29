@@ -341,7 +341,7 @@ api.MapGet("/incidents/{id:guid}", async (Guid id, WfiDb db, HttpContext c) =>
     var domain = Domain(c);
     var incident = await db.Incidents.AsNoTracking().FirstOrDefaultAsync(i => i.Id == id && i.Domain == domain);
     if (incident == null) return Results.NotFound();
-    var aiJob = incident.AiAnalysisId.HasValue ? await db.AiAnalysisJobs.AsNoTracking().FirstOrDefaultAsync(a => a.Id == incident.AiAnalysisId.Value) : null;
+    var aiJob = incident.AiAnalysisId.HasValue ? await db.AiAnalysisJobs.AsNoTracking().FirstOrDefaultAsync(a => a.Id == incident.AiAnalysisId.Value && a.Domain == domain) : null;
     return Results.Ok(new { incident.Id, incident.Title, incident.Severity, incident.Status, incident.Summary, incident.CreatedAt, aiAnalysis = aiJob?.Conclusion });
 }).RequireAuthorization();
 
@@ -359,7 +359,9 @@ api.MapPost("/remediations", async (RemediationRequest req, WfiDb db, HttpContex
     if (RemediationEngine.Find(playbook.Code) == null || playbook.Version != RemediationEngine.Version) return Results.BadRequest(new { error="Desteklenmeyen katalog sürümü." });
 
     var domain = Domain(c);
-    var device=await db.Devices.AsNoTracking().FirstOrDefaultAsync(d => d.Domain == domain && d.Hostname == req.Hostname && d.Status != "revoked", c.RequestAborted);
+    var hostname=req.Hostname?.Trim().ToLowerInvariant() ?? "";
+    if(!Regex.IsMatch(hostname,"\\A[a-z0-9]([a-z0-9-]{0,61}[a-z0-9])?\\z"))return Results.BadRequest(new { error="Geçerli bir makine adı girin." });
+    var device=await db.Devices.AsNoTracking().FirstOrDefaultAsync(d => d.Domain == domain && d.Hostname == hostname && d.Status != "revoked", c.RequestAborted);
     if (device == null) return Results.NotFound();
     if (!playbook.IsApproved || (playbook.RequiredRole == "Admin" && !c.User.IsInRole("Admin"))) return Results.Forbid();
 
@@ -379,7 +381,7 @@ api.MapPost("/remediations", async (RemediationRequest req, WfiDb db, HttpContex
         PlaybookCode = playbook.Code,
         PlaybookTitle = playbook.Title,
         Domain = domain,
-        Hostname = req.Hostname,
+        Hostname = device.Hostname,
         RiskLevel = playbook.RiskLevel,
         RequestedBy = c.User.Identity!.Name!,
         ApprovedBy = playbook.RiskLevel == "High" ? null : c.User.Identity!.Name!,
@@ -396,11 +398,10 @@ api.MapPost("/remediations", async (RemediationRequest req, WfiDb db, HttpContex
 
 api.MapGet("/remediations/{id:guid}", async (Guid id, WfiDb db, HttpContext c) =>
 {
-    var execution = await db.RemediationExecutions.AsNoTracking().FirstOrDefaultAsync(r => r.Id == id);
+    // Other domains' executions are indistinguishable from missing ones.
+    var domain = Domain(c);
+    var execution = await db.RemediationExecutions.AsNoTracking().FirstOrDefaultAsync(r => r.Id == id && r.Domain == domain);
     if (execution == null) return Results.NotFound();
-
-    // Check authorization - only related domain members
-    if (execution.Domain != Domain(c)) return Results.Forbid();
 
     var playbook = execution.PlaybookId != Guid.Empty ? await db.Playbooks.AsNoTracking().FirstOrDefaultAsync(p => p.Id == execution.PlaybookId) : null;
 

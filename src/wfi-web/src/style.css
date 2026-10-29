@@ -52,3 +52,4 @@ a{color:#b90014}:root[data-theme=dark] .sidebar nav button{background:transparen
 :root[data-theme=dark] .sidebar nav button.active{background:#4b1c25;color:#ffbac2}
 :root[data-theme=dark] input::placeholder,:root[data-theme=dark] textarea::placeholder{color:#a7a7b6;opacity:1}
 :root[data-theme=dark] input[readonly],:root[data-theme=dark] th,:root[data-theme=dark] .evidence{background:#15151e;border-color:#383842}
+.app-footer{padding:18px 30px 26px;font-size:12px;color:#5e6f86;border-top:1px solid rgba(128,148,173,.25);text-align:center}.login-main{padding-bottom:64px}.login-main>.app-footer{position:absolute;left:0;right:0;bottom:14px;border:0;padding:0 20px}:root[data-theme=dark] .app-footer{color:#9fb0c7;border-top-color:#2c3b50}

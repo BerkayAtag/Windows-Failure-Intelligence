@@ -1,3 +1,27 @@
+# 0.7.0 — 30 Ekim 2026 (güncel kurulum)
+
+**WFI-Server-Setup.exe → Yönetici olarak çalıştır → İleri → ayarlar → Kur → Bitir.** Sihirbaz Türkçe karakterlerle açılır, ilerleme çubuğu gösterir ve bitişte **Konsolu aç** bağlantısı verir. İndirme: https://github.com/BerkayAtag/Windows-Failure-Intelligence/releases/latest
+
+Kurulumun otomatik hazırladıkları: IIS, Visual C++ çalışma zamanı, .NET 10 Hosting Bundle, yalnız 127.0.0.1'de dinleyen PostgreSQL 17, HTTPS sertifikası (alan boşsa), Domain profilinde `WFI-HTTPS` (TCP/443) kuralı, veritabanı şeması ve `local:admin` hesabı. Bileşenler resmi kaynaklardan indirilir ve SHA256/SHA512 ile doğrulanır; Microsoft paketlerinin imzası ayrıca denetlenir.
+
+### Yerel yapay zekâ (Ollama) seçimi
+
+| Seçenek | Ne olur | Model adresi |
+|---|---|---|
+| **Ollama ve phi4-mini modelini WFI için kur** (makinede Ollama yoksa varsayılan) | Sabit sürümlü Ollama, `WFI.Ollama` Windows servisi olarak kurulur ve phi4-mini indirilir. | `http://127.0.0.1:11435` |
+| **Bu makinede çalışan Ollama'yı kullan** (127.0.0.1:11434 yanıt veriyorsa varsayılan) | Ayrı Ollama kurulmaz. phi4-mini mevcut Ollama'ya indirilmeye çalışılır; indirilemezse kurulum tamamlanır ve konsoldan kurulu bir model seçilir. | `http://127.0.0.1:11434` |
+| **Şimdi kurma** | AI bileşeni atlanır, gereken boş alan 15 GB yerine 5 GB'tır. AI teşhisi Ollama 127.0.0.1:11434'te hazırlanınca çalışır. | `http://127.0.0.1:11434` |
+
+Mevcut Ollama'yı seçerseniz Windows oturumu kapalıyken de çalışması için Ollama'yı servis olarak çalıştırın ve yalnız loopback'te dinlediğini doğrulayın. Kaldırıcı yalnız WFI'nin kurduğu `WFI.Ollama` servisini kaldırır; mevcut Ollama'ya dokunmaz.
+
+### Yeniden deneme ve yeniden başlatma
+
+Kurulum yarıda kalırsa (ör. "YENİDEN BAŞLATMA GEREKLİ") Windows'u yeniden başlatıp kurucuyu **aynı dizin, DNS adı, domain ve AI seçimiyle** tekrar çalıştırın. Tamamlanan adımlar (indirmeler, veritabanı, şema, kurulumun ürettiği HTTPS sertifikası) tekrarlanmaz; 0.7.0 ile yeniden denemede ikinci bir sertifika oluşturulmaz. Kurucu betikleri `-ExecutionPolicy Bypass` ile yalnız kendi süreci için başlatır; Windows istemci sürümlerindeki varsayılan *Restricted* politika kurulumu engellemez, makine politikası değiştirilmez. Grup İlkesi ile zorlanan *AllSigned* politikası kurulumu engelleyebilir.
+
+Programlar ve Özellikler (appwiz.cpl): **WFI Server**, yayıncı **Berkay Atağ**, sürüm **0.7.0**, kırmızı WFI simgesi, kurulum tarihi, boyut ve destek bağlantısı. Yayıncı adı kayıt bilgisidir, Authenticode imzası değildir.
+
+Gerçek Windows Server VM üzerinde uçtan uca kurulum/kaldırma kabulü bu geliştirme ortamında yapılmadı; ilk kurulumu pilot sunucuda yapın.
+
 # 0.6.0-preview.6 — 29 Ekim 2026
 
 ## 30 Ekim 2026 — CI süreç testi düzeltmesi
@@ -49,7 +73,7 @@ Yedek ve bakım prosedürüyle VerifiedExperienceMemory migration'ını veya ayn
 
 ## 0.4.1 ajan kurulum dağıtımı
 
-API paketinin `distribution/WFI-Agent.zip` dosyası WFI-Agent-Setup.exe ve self-contained ajanı içerir; Bu ZIP iç yük paketidir; güncel Admin indirmesi tek EXE sunar. Paket boyutu runtime'lar nedeniyle büyür; reverse proxy indirme zaman aşımı/bant genişliği planlanmalıdır. Dosya wwwroot dışında kalır. Setup mevcut Admin login ve devices/register uç noktalarını kullanır; anonim otomatik kayıt açılmadı. Domain/rol yönetimi LDAPS ayarlarıyla devam eder. Şema değişikliği yoktur.
+0.7.0'dan itibaren `distribution/WFI-Agent.zip` ara dosyası derlemeden sonra silinir ve sunucu paketine girmez (yalnız EXE'nin gömülü yüküdür). Eski sürümlerde bu ZIP WFI-Agent-Setup.exe ve self-contained ajanı içeriyordu; güncel Admin indirmesi tek EXE sunar. Paket boyutu runtime'lar nedeniyle büyür; reverse proxy indirme zaman aşımı/bant genişliği planlanmalıdır. Dosya wwwroot dışında kalır. Setup mevcut Admin login ve devices/register uç noktalarını kullanır; anonim otomatik kayıt açılmadı. Domain/rol yönetimi LDAPS ayarlarıyla devam eder. Şema değişikliği yoktur.
 
 
 ## 0.4.0 kurulum dosyası

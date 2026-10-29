@@ -1,18 +1,25 @@
-# Pure helpers: importing this file does not install or start anything.
+﻿# Pure helpers: importing this file does not install or start anything.
 . (Join-Path $PSScriptRoot 'InstallerSupport.ps1')
 function Assert-WfiSetupOptions($Options) {
     foreach($name in @('InstallPath','DataPath')) {
-        if([string]$Options.$name -notmatch '^[A-Za-z]:[\\/]' -or [string]$Options.$name -match '[\[\]*?"\r\n]'){throw 'Use a fully qualified local directory without wildcard characters.'}
+        if([string]$Options.$name -notmatch '^[A-Za-z]:[\\/]' -or [string]$Options.$name -match '[\[\]*?"\r\n]'){throw 'Joker karakter içermeyen tam bir yerel dizin yolu girin (örn. C:\Program Files\WFI Server).'}
     }
     foreach($name in @('Hostname','Domain')) {
-        if([string]$Options.$name -notmatch '^(?=.{1,253}$)[A-Za-z0-9](?:[A-Za-z0-9-]{0,61}[A-Za-z0-9])?(?:\.[A-Za-z0-9](?:[A-Za-z0-9-]{0,61}[A-Za-z0-9])?)*$'){throw "Invalid $name."}
+        if([string]$Options.$name -notmatch '^(?=.{1,253}$)[A-Za-z0-9](?:[A-Za-z0-9-]{0,61}[A-Za-z0-9])?(?:\.[A-Za-z0-9](?:[A-Za-z0-9-]{0,61}[A-Za-z0-9])?)*$'){throw $(if($name -eq 'Hostname'){'Sunucu DNS adı geçersiz.'}else{'İstemci domain adı geçersiz.'})}
     }
     Assert-WfiDistinctDirectories @([string]$Options.InstallPath,[string]$Options.DataPath)
-    if([string]$Options.PasswordHash -notmatch '^pbkdf2-sha256:600000:[A-Za-z0-9+/]{43}=:[A-Za-z0-9+/]{43}=$'){throw 'Invalid administrator hash.'}
-    if($Options.CertificateThumbprint -and [string]$Options.CertificateThumbprint -notmatch '^[A-Fa-f0-9]{40}$'){throw 'Invalid certificate thumbprint.'}
+    if([string]$Options.PasswordHash -notmatch '^pbkdf2-sha256:600000:[A-Za-z0-9+/]{43}=:[A-Za-z0-9+/]{43}=$'){throw 'Yönetici parola özeti geçersiz.'}
+    if($Options.CertificateThumbprint -and [string]$Options.CertificateThumbprint -notmatch '^[A-Fa-f0-9]{40}$'){throw 'Sertifika parmak izi 40 karakterlik onaltılık değer olmalı.'}
+    if([string](Get-WfiAiMode $Options) -notin @('Install','Existing','None')){throw 'AI kurulum seçimi geçersiz.'}
+}
+# Older option files have no AiMode; they always installed the dedicated AI service.
+function Get-WfiAiMode($Options){if($Options.AiMode){return [string]$Options.AiMode};return 'Install'}
+function Test-WfiExistingOllama([string]$BaseUrl='http://127.0.0.1:11434') {
+    # Loopback probe only; a non-Ollama listener must not be mistaken for a model server.
+    try{$tags=Invoke-RestMethod -Uri ($BaseUrl+'/api/tags') -TimeoutSec 3 -UseBasicParsing;return $null -ne $tags.models}catch{return $false}
 }
 function New-WfiPasswordHash([string]$Password) {
-    if($Password.Length -lt 14 -or $Password.Length -gt 1024){throw 'Use a password of 14 to 1024 characters.'}
+    if($Password.Length -lt 14 -or $Password.Length -gt 1024){throw 'Yönetici parolası 14 ile 1024 karakter arasında olmalı.'}
     $salt=New-Object byte[] 32
     $rng=[Security.Cryptography.RandomNumberGenerator]::Create()
     try{$rng.GetBytes($salt)}finally{$rng.Dispose()}
@@ -29,7 +36,7 @@ function Get-WfiAvailablePostgresPort {
         try{$listener.Server.ExclusiveAddressUse=$true;$listener.Start();return $port}catch{# Reserved/occupied ports are skipped, never reconfigured.
         }finally{$listener.Stop()}
     }
-    throw 'No available dedicated PostgreSQL loopback port was found.'
+    throw 'PostgreSQL için kullanılabilir yerel port bulunamadı.'
 }
 function Set-WfiProtectedDirectory([string]$Path,[string]$ServiceSid='') {
     [void](Assert-WfiSafePath $Path)
@@ -43,15 +50,15 @@ function Set-WfiProtectedDirectory([string]$Path,[string]$ServiceSid='') {
 function Assert-WfiDependency([string]$Path,$Spec) {
     if(!(Test-Path -LiteralPath $Path -PathType Leaf)){throw 'Dependency missing.'}
     [void](Assert-WfiSafePath $Path)
-    if((Get-FileHash -LiteralPath $Path -Algorithm $Spec.algorithm).Hash -ne $Spec.hash){throw "Dependency integrity check failed: $($Spec.file)"}
+    if((Get-FileHash -LiteralPath $Path -Algorithm $Spec.algorithm).Hash -ne $Spec.hash){throw "İndirilen paket doğrulanamadı: $($Spec.file)"}
 }
 function Assert-WfiSetupOwnership([string]$Path) {
     [void](Assert-WfiSafePath $Path)
     $acl=Get-Acl -LiteralPath $Path
-    if(!$acl.AreAccessRulesProtected){throw 'Setup directory must have protected permissions.'}
+    if(!$acl.AreAccessRulesProtected){throw 'Kurulum veri dizini korumalı izinlere sahip olmalı.'}
     foreach($rule in $acl.Access) {
         $sid=$rule.IdentityReference.Translate([Security.Principal.SecurityIdentifier]).Value
-        if($rule.AccessControlType -eq 'Allow' -and $sid -notin @('S-1-5-18','S-1-5-32-544')){throw 'Setup directory has untrusted access permissions.'}
+        if($rule.AccessControlType -eq 'Allow' -and $sid -notin @('S-1-5-18','S-1-5-32-544')){throw 'Kurulum veri dizininde güvenilmeyen erişim izni var.'}
     }
 }
 function Invoke-WfiExecutable([string]$File,[string[]]$Arguments,[int]$TimeoutSeconds=600) {
@@ -63,8 +70,8 @@ function Invoke-WfiExecutable([string]$File,[string[]]$Arguments,[int]$TimeoutSe
         # Never launch a second installer over a still-running prerequisite.
         $p.WaitForExit()
     }
-    if($p.ExitCode -eq 3010){throw 'REBOOT_REQUIRED: Restart Windows, then run this setup again.'}
-    if($p.ExitCode -ne 0){throw "Prerequisite failed with exit code $($p.ExitCode)."}
+    if($p.ExitCode -eq 3010){throw 'YENİDEN BAŞLATMA GEREKLİ: Windows''u yeniden başlatıp kurulumu aynı ayarlarla tekrar çalıştırın.'}
+    if($p.ExitCode -ne 0){throw "Ön koşul kurulumu $($p.ExitCode) çıkış koduyla başarısız oldu."}
 }
 function Expand-WfiDependency([string]$Archive,[string]$Destination,[string]$Prefix='') {
     Add-Type -AssemblyName System.IO.Compression.FileSystem

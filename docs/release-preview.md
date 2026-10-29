@@ -1,15 +1,29 @@
-Use preview.6 for automatic setup. Preview.4/5 could fail SQL provisioning under Windows PowerShell 5.1; explicit UTF8 byte transport fixes this and was verified against a real disposable PostgreSQL cluster.
+## WFI 0.7.0 — Windows Failure Intelligence
 
-WFI development preview: Windows endpoint diagnostics, local Ollama analysis, controlled remediation, pilot campaigns and BigFix central verification.
+Windows uç noktalarında kanıta dayalı teşhis, kurum içi yapay zekâ (Ollama) ve onaylı katalogla kontrollü onarım.
 
-Downloads:
-- WFI-Server-Setup.exe: Next / Install / Finish wizard for a NEW single-server pilot. Automatically downloads hash-pinned prerequisites, enables IIS, installs Hosting Bundle, creates dedicated loopback PostgreSQL/Ollama services and prepares schema during installation. Internet required, several GB download. Set local:admin password during setup; configure LDAP later. Real Windows VM installation acceptance remains open.
-- Client setup is included inside the server distribution and downloaded from the authenticated WFI console; no separate client EXE release asset.
-- WFI-0.6.0-preview.6-pilot.zip: deployment bundle, SQL and installation documentation.
-- SHA256SUMS.txt: integrity hashes, not publisher authentication.
+![WFI analiz merkezi](https://raw.githubusercontent.com/BerkayAtag/Windows-Failure-Intelligence/main/site/assets/console.png)
 
-The EXEs are not Authenticode-signed. Use an isolated pilot environment. Real AD/BigFix integration, Windows VM installation and HA/40k endpoint capacity acceptance remain open. See docs/verification-current.md and docs/implementation-roadmap.md; this is not a zero-defect or production certification claim.
+### İndirme
+- **WFI-Server-Setup.exe**: Windows Server için tıkla-kur sihirbazı. Yönetici olarak çalıştırın → **İleri → Kur → Bitir**.
+- **SHA256SUMS.txt**: dosya bütünlüğü (yayıncı doğrulaması değildir).
+- İstemci ajanı ayrı release dosyası değildir: kurulumdan sonra konsolda **Ajan ve Ağ Erişimleri → Windows ajanını indir**.
 
-Agent robustness: strict HTTPS origin, response/state size limits, journal consistency, protocol fallback and 429 recovery tests. Audit entries are now domain-scoped; legacy unassigned audit rows remain in the database but are hidden from the tenant web list. Apply AuditDomainScope via the reviewed SQL migration before accepting traffic.
+### Bu sürümde
+- Kurulum sihirbazı yenilendi: Türkçe karakterler, adım göstergesi, ilerleme çubuğu, **Konsolu aç** bağlantısı.
+- **Ollama seçeneği:** makinede yoksa WFI kurar (varsayılan); 127.0.0.1:11434'te çalışan bir Ollama varsa onu kullanabilir; ya da AI'yı sonraya bırakabilirsiniz.
+- IIS, .NET 10 Hosting Bundle, VC++ çalışma zamanı, PostgreSQL, HTTPS sertifikası, güvenlik duvarı kuralı ve şema otomatik hazırlanır. Yeniden denemede ikinci sertifika oluşturulmaz.
+- Kurulum ve kaldırma betikleri kendi süreçleri için `-ExecutionPolicy Bypass` ile başlar; Windows'un varsayılan *Restricted* politikası artık kurulumu durdurmaz.
+- Programlar ve Özellikler: **WFI Server / WFI Agent**, yayıncı **Berkay Atağ**, sürüm 0.7.0, yeni kırmızı WFI simgesi (tırnaksız `DisplayIcon` yolu), kurulum tarihi, boyut ve destek bağlantısı.
+- İstemci ajanı kurulumu için **PowerShell 7 gerekmez**; Windows PowerShell 5.1 yeterli.
+- İptal edilmiş makine veya süresi dolmuş kullanılmamış kayıt aynı cihaz kimliğiyle yeniden kaydedilebilir; cihaz iptalinde bekleyen teşhisler kapatılır ve başlamamış onarımlar iptal edilir.
+- Güvenlik: başka domain'e ait onarım kaydı artık 403 yerine 404 döndürür (varlık sızdırmaz); olay detayındaki AI özeti domain ile sınırlandı; manuel onarım isteğinde makine adı doğrulanır ve normalize edilir.
+- Sunucu konsolu, kurulum pencereleri ve tanıtım sayfasında altbilgi: **© 2026 Berkay Atağ · Windows Failure Intelligence (WFI)**.
+- Tanıtım sayfası yenilendi: açık/karanlık tema düğmesi, temaya göre değişen güncel ekran görüntüleri.
 
-Red/white light theme is the new-session default; dark theme remains available. Repair campaigns are labeled Onarım Otomasyonu. Both installers include a red WFI icon and register Publisher Berkay Atağ in Programs and Features. Registry publisher is not Authenticode signing. Removal preserves configuration, identity, evidence, keys and protected uninstall helpers. Reparse ancestors and overlapping application/evidence/key paths are rejected.
+### Bilinen sınırlar
+EXE'ler Authenticode imzalı değildir; SmartScreen uyarısı görülebilir. İlk kurulum internetten birkaç GB indirir. Gerçek Windows Server VM'de uçtan uca kurulum/kaldırma, gerçek AD/BigFix, HA ve 40 bin cihaz kapasite kabulü bu sürümde ölçülmedi; pilot ortamda doğrulayın. Ayrıntı: [doğrulama](https://github.com/BerkayAtag/Windows-Failure-Intelligence/blob/main/docs/verification-current.md).
+
+Tanıtım: https://berkayatag.github.io/Windows-Failure-Intelligence/
+
+© 2026 Berkay Atağ · Windows Failure Intelligence (WFI)

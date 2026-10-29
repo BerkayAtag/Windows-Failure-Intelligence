@@ -1,4 +1,4 @@
-function Resolve-WfiDotnetSdk {
+﻿function Resolve-WfiDotnetSdk {
     $installed = @(Get-Command dotnet -CommandType Application -All -ErrorAction SilentlyContinue | Select-Object -ExpandProperty Source)
     $candidates = @($installed) + @(Join-Path $env:LOCALAPPDATA 'WFI/dotnet/dotnet.exe')
     foreach ($candidate in ($candidates | Select-Object -Unique)) {

@@ -69,8 +69,25 @@ public static class AgentEndpoints
             var domain = c.User.FindFirstValue("domain")!;
             await using var tx=await db.Database.BeginTransactionAsync(c.RequestAborted);
             await DiagnosticAdmission.LockAsync(db,domain,c.RequestAborted);
-            if (await db.Devices.AnyAsync(d => d.Domain == domain && d.Hostname == host, c.RequestAborted)) return Results.Conflict();
             var token = AgentCoordinator.NewSecret();
+            var existing = await db.Devices.AsNoTracking().Where(d => d.Domain == domain && d.Hostname == host).Select(d => new { d.Id, d.Status, d.AgentCredentialHash, d.EnrollmentExpiresAt }).FirstOrDefaultAsync(c.RequestAborted);
+            if (existing != null)
+            {
+                // A revoked device or an expired, never-used enrollment may be re-registered under the same identity row.
+                // A fresh pending registration or an enrolled agent is never replaced silently.
+                var now = DateTime.UtcNow;
+                if (existing.Status != "revoked" && !(existing.Status == "pending" && existing.AgentCredentialHash == null && (existing.EnrollmentExpiresAt == null || existing.EnrollmentExpiresAt <= now)))
+                    return Results.Conflict(new { error = "Bu makine zaten kayıtlı. Bekleyen kayıt için konsoldan token yenileyin veya cihazı önce iptal edin." });
+                var expiry = now.AddHours(1);
+                var reused = await db.Devices.Where(d => d.Id == existing.Id && d.Domain == domain && d.Status == existing.Status && d.AgentCredentialHash == existing.AgentCredentialHash)
+                    .ExecuteUpdateAsync(s => s.SetProperty(d => d.Status, "pending").SetProperty(d => d.AgentCredentialHash, (string?)null)
+                        .SetProperty(d => d.EnrollmentToken, AgentCoordinator.Hash(token)).SetProperty(d => d.EnrollmentExpiresAt, expiry).SetProperty(d => d.NextDiagnosticAt, (DateTime?)null), c.RequestAborted);
+                if (reused != 1) return Results.Conflict();
+                db.Audit.Add(new() { Domain=domain, Actor=c.User.Identity!.Name!, Action="device.reregistered", Target=existing.Id.ToString() });
+                await db.SaveChangesAsync(c.RequestAborted);
+                await tx.CommitAsync(c.RequestAborted);
+                return Results.Ok(new { existing.Id, Hostname=host, Domain=domain, enrollmentToken=token, EnrollmentExpiresAt=expiry });
+            }
             var device = new Device { Domain=domain, Hostname=host, Status="pending", OsVersion="", AgentVersion="",
                 EnrollmentToken=AgentCoordinator.Hash(token), EnrollmentExpiresAt=DateTime.UtcNow.AddHours(1) };
             db.Devices.Add(device); db.Audit.Add(new() { Domain=c.User.FindFirstValue("domain")!, Actor=c.User.Identity!.Name!, Action="device.registered", Target=device.Id.ToString() });
@@ -93,12 +110,19 @@ public static class AgentEndpoints
         api.MapPost("/devices/{id:guid}/revoke", async (Guid id, HttpContext c, WfiDb db) =>
         {
             var domain = c.User.FindFirstValue("domain")!;
+            await using var tx=await db.Database.BeginTransactionAsync(c.RequestAborted);
             var changed = await db.Devices.Where(d => d.Id == id && d.Domain == domain)
                 .ExecuteUpdateAsync(s => s.SetProperty(d => d.Status, "revoked").SetProperty(d => d.AgentCredentialHash, (string?)null)
                     .SetProperty(d => d.EnrollmentToken, (string?)null), c.RequestAborted);
             if (changed == 0) return Results.NotFound();
-            db.Audit.Add(new() { Domain=c.User.FindFirstValue("domain")!, Actor=c.User.Identity!.Name!, Action="device.revoked", Target=id.ToString() });
-            await db.SaveChangesAsync(c.RequestAborted); return Results.Ok();
+            // A revoked agent can never deliver evidence or run work: release its queue capacity and unstarted repairs.
+            var now=DateTime.UtcNow;
+            await db.DiagnosticJobs.Where(j=>j.DeviceId==id&&j.Domain==domain&&(j.Status=="pending"||j.Status=="running"))
+                .ExecuteUpdateAsync(s=>s.SetProperty(j=>j.Status,"failed").SetProperty(j=>j.Error,"Cihaz iptal edildi.").SetProperty(j=>j.CompletedAt,now),c.RequestAborted);
+            await db.RemediationExecutions.Where(r=>r.DeviceId==id&&r.Domain==domain&&(r.Status=="Approved"||r.Status=="PendingApproval"))
+                .ExecuteUpdateAsync(s=>s.SetProperty(r=>r.Status,"Cancelled").SetProperty(r=>r.CompletedAt,now).SetProperty(r=>r.Error,"Cihaz iptal edildiği için başlamadan iptal edildi."),c.RequestAborted);
+            db.Audit.Add(new() { Domain=domain, Actor=c.User.Identity!.Name!, Action="device.revoked", Target=id.ToString() });
+            await db.SaveChangesAsync(c.RequestAborted); await tx.CommitAsync(c.RequestAborted); return Results.Ok();
         }).RequireAuthorization("Admin");
 
         api.MapPost("/agent/enroll", async (AgentEnrollment input, HttpContext c, AgentCoordinator coordinator) =>

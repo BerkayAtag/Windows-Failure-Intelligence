@@ -1,4 +1,4 @@
-param([int]$Port = 5080)
+﻿param([int]$Port = 5080)
 $ErrorActionPreference = 'Stop'
 $projectRoot = Split-Path $PSScriptRoot -Parent
 . (Join-Path $PSScriptRoot 'Resolve-Dotnet.ps1')

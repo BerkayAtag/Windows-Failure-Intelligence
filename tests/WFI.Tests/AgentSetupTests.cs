@@ -51,6 +51,48 @@ public class AgentSetupTests
         Assert.Equal(ticket.Id,device.Id);Assert.Equal(AgentCoordinator.Hash(ticket.EnrollmentToken),device.EnrollmentToken);
     }
     [Fact]
+    public async Task RevokedOrExpiredRegistrationIsReissuedOnSameIdentity()
+    {
+        using var app=new TestApp();using var client=app.CreateClient(new WebApplicationFactoryClientOptions{BaseAddress=new Uri("https://localhost")});
+        var first=await AgentSetupRegistration.RegisterAsync(client,"admin","test-password","reissue-pc",default);
+        var oldCredential=AgentCoordinator.NewSecret();
+        Assert.Equal(HttpStatusCode.OK,(await client.PostAsJsonAsync("/api/v1/agent/enroll",new AgentEnrollment(first.Id,first.EnrollmentToken,oldCredential))).StatusCode);
+        await Assert.ThrowsAsync<InvalidOperationException>(()=>AgentSetupRegistration.RegisterAsync(client,"admin","test-password","reissue-pc",default));
+        using(var seed=app.Services.CreateScope())
+        {
+            var seedDb=seed.ServiceProvider.GetRequiredService<WfiDb>();
+            seedDb.DiagnosticJobs.Add(new(){DeviceId=first.Id,Domain="example.invalid",Hostname="reissue-pc",RequestedBy="synthetic",ScanType="FullSystemScan",Status="pending"});
+            await seedDb.SaveChangesAsync();
+        }
+        var csrf=await client.GetFromJsonAsync<System.Text.Json.JsonElement>("/api/v1/auth/csrf");
+        client.DefaultRequestHeaders.Add("X-CSRF-TOKEN",csrf.GetProperty("token").GetString());
+        Assert.Equal(HttpStatusCode.OK,(await client.PostAsJsonAsync("/api/v1/auth/login",new{username="admin",password="test-password"})).StatusCode);
+        client.DefaultRequestHeaders.Remove("X-CSRF-TOKEN");csrf=await client.GetFromJsonAsync<System.Text.Json.JsonElement>("/api/v1/auth/csrf");
+        client.DefaultRequestHeaders.Add("X-CSRF-TOKEN",csrf.GetProperty("token").GetString());
+        Assert.Equal(HttpStatusCode.OK,(await client.PostAsync($"/api/v1/devices/{first.Id}/revoke",null)).StatusCode);
+        await client.PostAsync("/api/v1/auth/logout",null);client.DefaultRequestHeaders.Remove("X-CSRF-TOKEN");
+        var second=await AgentSetupRegistration.RegisterAsync(client,"admin","test-password","REISSUE-PC",default);
+        Assert.Equal(first.Id,second.Id);Assert.NotEqual(first.EnrollmentToken,second.EnrollmentToken);
+        Assert.Equal(HttpStatusCode.OK,(await client.PostAsJsonAsync("/api/v1/agent/enroll",new AgentEnrollment(second.Id,second.EnrollmentToken,AgentCoordinator.NewSecret()))).StatusCode);
+        using var scope=app.Services.CreateScope();var db=scope.ServiceProvider.GetRequiredService<WfiDb>();
+        Assert.Null(await scope.ServiceProvider.GetRequiredService<AgentCoordinator>().AuthenticateAsync(first.Id,oldCredential,default));
+        Assert.Equal("failed",(await db.DiagnosticJobs.SingleAsync(j=>j.DeviceId==first.Id)).Status);
+        Assert.Equal(1,await db.Devices.CountAsync());
+    }
+    [Fact]
+    public async Task ExpiredUnusedRegistrationIsReissuedButFreshOneIsNot()
+    {
+        using var app=new TestApp();using var client=app.CreateClient(new WebApplicationFactoryClientOptions{BaseAddress=new Uri("https://localhost")});
+        var expired=await AgentSetupRegistration.RegisterAsync(client,"admin","test-password","expired-pc",default);
+        await Assert.ThrowsAsync<InvalidOperationException>(()=>AgentSetupRegistration.RegisterAsync(client,"admin","test-password","expired-pc",default));
+        using(var scope=app.Services.CreateScope())
+            await scope.ServiceProvider.GetRequiredService<WfiDb>().Devices.Where(d=>d.Id==expired.Id).ExecuteUpdateAsync(x=>x.SetProperty(d=>d.EnrollmentExpiresAt,DateTime.UtcNow.AddMinutes(-1)));
+        var renewed=await AgentSetupRegistration.RegisterAsync(client,"admin","test-password","expired-pc",default);
+        Assert.Equal(expired.Id,renewed.Id);Assert.NotEqual(expired.EnrollmentToken,renewed.EnrollmentToken);
+        Assert.Equal(HttpStatusCode.Unauthorized,(await client.PostAsJsonAsync("/api/v1/agent/enroll",new AgentEnrollment(expired.Id,expired.EnrollmentToken,AgentCoordinator.NewSecret()))).StatusCode);
+        Assert.Equal(HttpStatusCode.OK,(await client.PostAsJsonAsync("/api/v1/agent/enroll",new AgentEnrollment(renewed.Id,renewed.EnrollmentToken,AgentCoordinator.NewSecret()))).StatusCode);
+    }
+    [Fact]
     public async Task ConcurrentSetupCreatesOnlyOneIdentity()
     {
         using var app=new TestApp();using var first=app.CreateClient(new WebApplicationFactoryClientOptions{BaseAddress=new Uri("https://localhost")});

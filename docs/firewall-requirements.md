@@ -1,3 +1,16 @@
+# 0.7.0 — 30 Ekim 2026
+
+Yeni port yoktur. Otomatik kurulumdaki AI seçimine göre model bağlantısı yalnız loopback'tedir:
+
+| Kaynak | Hedef | Port | Not |
+|---|---|---|---|
+| WFI API/worker | WFI'nin kurduğu Ollama (`WFI.Ollama`) | 127.0.0.1 TCP/11435 | "WFI için kur" seçeneği; ağa açılmaz |
+| WFI API/worker | Makinede zaten çalışan Ollama | 127.0.0.1 TCP/11434 | "Mevcut Ollama'yı kullan" veya "Şimdi kurma"; ağa açmayın |
+| WFI API/worker | Özel PostgreSQL | 127.0.0.1 TCP/55432 (dolu ise 35432–35531) | Ağa açılmaz |
+| İstemci/tarayıcı | WFI | TCP/443 | Kurucu yalnız Domain profiline `WFI-HTTPS` kuralını ekler |
+
+"Şimdi kurma" veya "Mevcut Ollama" seçildiğinde kurulum sırasında GitHub/Ollama release indirmesi yapılmaz; model indirmesi için Ollama registry erişimi yalnız mevcut Ollama ile phi4-mini çekilirken gerekir. İstemci ajanı için inbound port yoktur; ajan → WFI HTTPS 443 çıkışı yeterlidir.
+
 # 0.6.0-preview.6 — 29 Ekim 2026
 
 PostgreSQL varsayılan 55432 portu Windows tarafından ayrılmış veya doluysa kurucu 35432–35531 aralığından uygun bir loopback portunu otomatik seçip yapılandırmaya kaydeder; ağdan DB erişimi açılmaz.

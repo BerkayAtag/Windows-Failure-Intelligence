@@ -1,4 +1,4 @@
-param([Parameter(Mandatory)][string]$PostgresBin, [int]$Port=55439)
+﻿param([Parameter(Mandatory)][string]$PostgresBin, [int]$Port=55439)
 $ErrorActionPreference='Stop'
 if($Port -lt 1024 -or $Port -gt 65535){throw 'Port 1024..65535 aralığında olmalı.'}
 $projectRoot=Split-Path $PSScriptRoot -Parent

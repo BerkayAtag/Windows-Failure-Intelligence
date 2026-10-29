@@ -1,3 +1,13 @@
+# 0.7.0 — 30 Ekim 2026 (güncel istemci kurulumu)
+
+- **Ek ön koşul yok.** Ajan kurucusu artık Windows 10/11 ve Windows Server ile gelen **Windows PowerShell 5.1** ile çalışır; PowerShell 7 gerekmez. Ajanın .NET 10 çalışma zamanı EXE'nin içindedir. Ajan servisi zaten Windows PowerShell 5.1 kullanıyordu; değişen yalnız kurulum adımıdır.
+- **Yeniden kayıt:** Konsolda **iptal edilmiş (revoked)** bir makine veya süresi dolmuş ve hiç kullanılmamış bekleyen kayıt, aynı makine adıyla setup çalıştırıldığında **aynı cihaz kimliğiyle** yeni tek kullanımlık token alır. Online/kayıtlı bir ajan ve son bir saat içinde açılmış bekleyen kayıt sessizce değiştirilmez (409). Eski ajan kimlik bilgisi iptalden sonra geçersiz kalır.
+- **İptal temizliği:** Cihaz iptal edildiğinde bekleyen/çalışan teşhisleri "Cihaz iptal edildi" ile kapanır ve başlamamış onarımlar iptal edilir; böylece domain teşhis kuyruğu kapasitesi boşa tutulmaz.
+- Setup penceresi sunucu adresini makinenin DNS domain'ine göre önerir (`https://wfi.<domain>`); konsoldaki sessiz kurulum örneği konsolun gerçek HTTPS adresini gösterir.
+- Programlar ve Özellikler: **WFI Agent**, yayıncı **Berkay Atağ**, sürüm 0.7.0 ve kırmızı WFI simgesi. İstemci EXE'si GitHub release dosyası değildir; kurum konsolunda **Ajan ve Ağ Erişimleri → Windows ajanını indir** ile alınır.
+
+Aşağıdaki eski bölümlerde geçen "PowerShell 7 gerekir" ifadeleri 0.7.0 öncesi sürümler içindir.
+
 # 0.6.0-preview.6 — 29 Ekim 2026
 
 Güncel kurulum sürümü **preview.6**. Önceki preview.4/5 kurucularını kullanmayın: Windows PowerShell 5.1'in standart girdi kodlaması SQL aktarımını bozabiliyordu. Kurucu artık SQL'i UTF-8 baytlarıyla gönderir. Gerçek PostgreSQL'de PowerShell 5.1 üzerinden ilk/tekrarlı rol-veritabanı hazırlığı, tam şema ve Türkçe metin roundtrip testi geçti. Kalıcı regresyon: `scripts/Test-ServerSqlTransport.ps1`; `Test-Postgres.ps1` bunu da çalıştırır. İnternet gereksinimi ve açık Windows VM kabul kapısı değişmedi.
@@ -15,7 +25,7 @@ Yeni sunucu sihirbazı ilk yönetici hesabını `local:admin` olarak oluşturur;
 
 ## 0.5.0 — tek EXE ile kurulum
 
-Konsolda **Ajan ve Ağ Erişimleri → Ajan kurulumu → Windows ajanını indir** seçin. Artık ZIP açmanız gerekmez; indirilen WFI-Agent-Setup.exe tek dağıtım dosyasıdır. PowerShell 7 x64 ve Windows .NET Framework 4.8 ön koşuldur. Kurucu yönetici yetkisiyle açılır; kendi yükünü Program Files altında rastgele adlı, SYSTEM/Administrators dışında erişilemeyen dizine çıkarır ve işlem sonrasında temizler. Ajan .NET 10 runtime'ı dahildir. EXE imzasızdır; kurumsal dağıtımda Authenticode imzalama gerekir.
+Konsolda **Ajan ve Ağ Erişimleri → Ajan kurulumu → Windows ajanını indir** seçin. Artık ZIP açmanız gerekmez; indirilen WFI-Agent-Setup.exe tek dağıtım dosyasıdır. Windows ile gelen PowerShell 5.1 ve .NET Framework 4.8 yeterlidir (0.7.0 öncesi sürümler PowerShell 7 x64 istiyordu). Kurucu yönetici yetkisiyle açılır; kendi yükünü Program Files altında rastgele adlı, SYSTEM/Administrators dışında erişilemeyen dizine çıkarır ve işlem sonrasında temizler. Ajan .NET 10 runtime'ı dahildir. EXE imzasızdır; kurumsal dağıtımda Authenticode imzalama gerekir.
 
 Pencereli kurulumda HTTPS adresi ve WFI Admin hesabı girilir; makine kendiliğinden kaydolur. Kurulan servis Program Files/WFI Agent altındaki dosyaları kullanır; kurulumdan sonra bu dosyaları tek başına taşımayın.
 
@@ -51,7 +61,7 @@ Başarısız işlemde pending kayıt kalabilir; tekrar kayıtla kimlik devralın
 
 ## Pencereli kurulum adımları
 
-1. İstemcide PowerShell 7 x64 kurulu olmalı. WFI HTTPS adresinin sertifika zinciri güvenilir olmalı. Ajan ve setup gerekli .NET runtime'ını içerir.
+1. Ek ön koşul yoktur (0.7.0+: Windows PowerShell 5.1 yeterli). WFI HTTPS adresinin sertifika zinciri güvenilir olmalı. Ajan ve setup gerekli .NET runtime'ını içerir.
 2. WFI konsoluna Admin ile giriş yapın. **Ajan ve Ağ Erişimleri → Ajan kurulumu** sekmesinden tek EXE dosyasını indirin.
 3. `WFI-Agent-Setup.exe` çalıştırın. Windows yönetici yetkisi ister. HTTPS sunucu kök adresini ve **WFI Admin** hesabını yazıp **Kur ve konsola kaydet** seçin. Windows yerel yönetici olmak tek başına WFI kayıt yetkisi vermez.
 4. Makine adı otomatik alınır; domain sunucuda doğrulanan oturumdan atanır. Kurulum öncesi konsolda elle cihaz oluşturmayın. Ajan `C:\Program Files\WFI Agent` konumuna, Windows servisi olarak kurulur. AI sunucuda kalır.
@@ -86,7 +96,7 @@ Kurum destekli Edge/Chrome, WFI DNS çözümlemesi, HTTPS 443 ve kurum CA güven
 1. Hedef Windows x64 cihazında kurumun desteklediği .NET 10 Runtime ve kurulum için PowerShell 7 hazırlayın. Runtime uyumluluğunu işletim sistemi sürümünüzle doğrulayın. Derleme makinesinde scripts/Build.ps1 çalıştırılmış olmalı; artifacts/agent paketini hedefe güvenli dağıtın.
 2. Cihazın WFI FQDN'ini çözebildiğini, TCP 443'e eriştiğini ve sertifika CA'sına güvendiğini doğrulayın. Sertifika doğrulamasını kapatmayın. Ajan için inbound port gerekmez.
 3. WFI'ye Admin olarak girin. Cihazlar ve AI → Yeni cihaz hostname → Cihaz kaydet. Cihaz ID ve tek kullanımlık token'ı güvenli alın. Token bir saatte sona erer. Kaybolursa henüz kayıt olmamış cihazı açıp Kayıt token'ını yenile seçin; eski token iptal olur.
-4. Hedefte PowerShell 7'yi yönetici olarak açın:
+4. Hedefte Windows PowerShell'i (0.7.0+; eski sürümlerde PowerShell 7) yönetici olarak açın:
 
 ```powershell
 .\scripts\Install-Agent.ps1 -PackagePath 'C:\Staging\WFI\agent' -ServerUrl 'https://wfi.example.invalid' -DeviceId 'KAYIT-EKRANINDAKI-GUID'

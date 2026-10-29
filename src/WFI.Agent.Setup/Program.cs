@@ -46,10 +46,11 @@ internal static class SetupInstall
 {
     internal static async Task RunAsync(Uri server,Guid deviceId,string token,string? bigFixHash=null)
     {
-        var shell=Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.ProgramFiles),"PowerShell","7","pwsh.exe");
-        if(!File.Exists(shell))throw new InvalidOperationException("PowerShell 7 x64 gerekli.");
+        // Built-in Windows PowerShell 5.1: no separate PowerShell 7 prerequisite on clients.
+        var shell=Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.System),"WindowsPowerShell","v1.0","powershell.exe");
+        if(!File.Exists(shell))throw new InvalidOperationException("Windows PowerShell bulunamadı.");
         var start=new ProcessStartInfo(shell){UseShellExecute=false,CreateNoWindow=true,RedirectStandardInput=true,RedirectStandardOutput=true,RedirectStandardError=true};
-        foreach(var arg in new[]{"-NoProfile","-NonInteractive","-Command",
+        foreach(var arg in new[]{"-NoProfile","-NonInteractive","-ExecutionPolicy","Bypass","-Command",
             "$ErrorActionPreference='Stop'; try { $p=[Console]::In.ReadLine() | ConvertFrom-Json; $options=@{PackagePath=$p.packagePath;ServerUrl=$p.serverUrl;DeviceId=$p.deviceId;EnrollmentToken=$(if($p.token){ConvertTo-SecureString $p.token -AsPlainText -Force}else{[Security.SecureString]::new()})}; if($p.bigFixHash){$options.BigFixReinstallSha256=$p.bigFixHash}; & (Join-Path $p.packagePath 'Install-Agent.ps1') @options; exit 0 } catch { exit 1 }"})start.ArgumentList.Add(arg);
         using var process=Process.Start(start)??throw new IOException();
         var output=process.StandardOutput.ReadToEndAsync();var error=process.StandardError.ReadToEndAsync();
@@ -63,7 +64,13 @@ internal static class SetupInstall
 
 internal sealed class SetupForm:Form
 {
-    readonly TextBox server=new(){Text="https://wfi.example.invalid",Dock=DockStyle.Fill};
+    readonly TextBox server=new(){Text=DefaultServer(),Dock=DockStyle.Fill};
+    // Suggest the WFI host in this machine's own DNS domain; the operator can change it before installing.
+    static string DefaultServer()
+    {
+        try{var domain=System.Net.NetworkInformation.IPGlobalProperties.GetIPGlobalProperties().DomainName;return "https://wfi."+(string.IsNullOrWhiteSpace(domain)?"example.invalid":domain.Trim().ToLowerInvariant());}
+        catch(System.Net.NetworkInformation.NetworkInformationException){return "https://wfi.example.invalid";}
+    }
     readonly TextBox username=new(){Dock=DockStyle.Fill};
     readonly TextBox password=new(){UseSystemPasswordChar=true,Dock=DockStyle.Fill};
     readonly Button install=new(){Text="Kur ve konsola kaydet",AutoSize=true};
@@ -78,6 +85,7 @@ internal sealed class SetupForm:Form
         layout.Controls.Add(new Label{Text="Makine: "+Environment.MachineName,AutoSize=true});
         Field("WFI sunucusu (HTTPS)",server);Field("WFI Admin kullanıcı adı",username);Field("Parola",password);
         layout.Controls.Add(install);layout.Controls.Add(status);Controls.Add(layout);
+        Controls.Add(new Label{Text="© 2026 Berkay Atağ · Windows Failure Intelligence (WFI)",Dock=DockStyle.Bottom,Height=30,Padding=new Padding(24,0,0,8),ForeColor=Color.DimGray,Font=new Font(Font.FontFamily,8.5f)});
         install.Click+=async(_,_)=>await Install();
         FormClosing+=(_,e)=>{if(running)e.Cancel=true;};
     }
@@ -86,8 +94,6 @@ internal sealed class SetupForm:Form
         if(running)return;
         if(!Uri.TryCreate(server.Text.Trim(),UriKind.Absolute,out var url)||url.Scheme!="https"||url.UserInfo.Length>0||url.AbsolutePath!="/"||url.Query.Length>0||url.Fragment.Length>0)
         {status.Text="Yalnız HTTPS sunucu kök adresi girin.";return;}
-        var shell=Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.ProgramFiles),"PowerShell","7","pwsh.exe");
-        if(!File.Exists(shell)){status.Text="Önce PowerShell 7 x64 kurun, ardından kurulumu tekrar açın.";return;}
         if(File.Exists(Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.ProgramFiles),"WFI Agent","appsettings.local.json")))
         {status.Text="Mevcut ajan bulundu. Kimliği koruyarak yükseltmek için paket içindeki Install-Agent.ps1 ve istemci rehberini kullanın.";return;}
         running=true;install.Enabled=false;server.Enabled=username.Enabled=password.Enabled=false;

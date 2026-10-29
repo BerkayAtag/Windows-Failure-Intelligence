@@ -1,4 +1,4 @@
-# Shared install/remove guards; dot-sourcing has no side effects.
+﻿# Shared install/remove guards; dot-sourcing has no side effects.
 function Assert-WfiSafePath([string]$Path) {
     if (-not [IO.Path]::IsPathRooted($Path) -or $Path.StartsWith('\\')) { throw 'A local absolute path is required.' }
     $full=[IO.Path]::GetFullPath($Path)
@@ -15,8 +15,12 @@ function Get-WfiUninstallProperties([string]$Product,[string]$InstallPath) {
     if($Product -notin @('Agent','Server')){throw 'Unknown WFI product.'}
     $full=Assert-WfiSafePath $InstallPath
     return @{
-        DisplayName="WFI $Product"; Publisher=("Berkay Ata"+[char]0x011F); DisplayVersion='0.6.0-preview.6'
-        DisplayIcon=('"'+(Join-Path $full 'wfi.ico')+'",0'); InstallLocation=$full
+        DisplayName="WFI $Product"; Publisher=("Berkay Ata"+[char]0x011F); DisplayVersion='0.7.0'
+        # Programs and Features reads an unquoted icon path; quoting plus an index can hide the icon.
+        DisplayIcon=(Join-Path $full 'wfi.ico'); InstallLocation=$full
+        URLInfoAbout='https://berkayatag.github.io/Windows-Failure-Intelligence/'
+        HelpLink='https://github.com/BerkayAtag/Windows-Failure-Intelligence'
+        Comments='Windows Failure Intelligence (WFI)'
         UninstallString=('"'+(Join-Path $full 'WFI-Uninstall.exe')+'"')
         NoModify=1; NoRepair=1
     }
@@ -26,6 +30,10 @@ function Register-WfiInstallation([string]$Product,[string]$InstallPath,[string]
     $manifest=@{Product=$Product;InstallPath=$properties.InstallLocation;SiteName=$SiteName}
     $manifest | ConvertTo-Json | Set-Content -LiteralPath (Join-Path $InstallPath 'wfi-installation.json') -Encoding UTF8
     $key="HKLM:\SOFTWARE\Microsoft\Windows\CurrentVersion\Uninstall\WFI.$Product"
+    $properties.InstallDate=(Get-Date).ToString('yyyyMMdd')
+    # Programs and Features shows EstimatedSize in KB; it is informational only.
+    $bytes=(Get-ChildItem -LiteralPath $InstallPath -Recurse -File -Force -ErrorAction SilentlyContinue | Measure-Object -Property Length -Sum).Sum
+    $properties.EstimatedSize=[int][Math]::Min([int]::MaxValue,[Math]::Ceiling([double]$bytes/1KB))
     New-Item -Path $key -Force | Out-Null
     foreach($name in $properties.Keys) {
         $kind=if($properties[$name] -is [int]){'DWord'}else{'String'}
@@ -36,7 +44,7 @@ function Assert-WfiDistinctDirectories([string[]]$Paths) {
     $normalized=@($Paths | ForEach-Object { (Assert-WfiSafePath $_).TrimEnd('\') })
     for($i=0;$i -lt $normalized.Count;$i++) {
         for($j=$i+1;$j -lt $normalized.Count;$j++) {
-            if($normalized[$i] -eq $normalized[$j] -or $normalized[$i].StartsWith($normalized[$j]+'\',[StringComparison]::OrdinalIgnoreCase) -or $normalized[$j].StartsWith($normalized[$i]+'\',[StringComparison]::OrdinalIgnoreCase)){throw 'Application, evidence and key directories must be disjoint.'}
+            if($normalized[$i] -eq $normalized[$j] -or $normalized[$i].StartsWith($normalized[$j]+'\',[StringComparison]::OrdinalIgnoreCase) -or $normalized[$j].StartsWith($normalized[$i]+'\',[StringComparison]::OrdinalIgnoreCase)){throw 'Uygulama, kanıt ve anahtar dizinleri aynı veya iç içe olamaz.'}
         }
     }
 }

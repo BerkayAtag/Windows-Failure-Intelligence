@@ -1,4 +1,4 @@
-#Requires -RunAsAdministrator
+﻿#Requires -RunAsAdministrator
 #Requires -Version 5.1
 $ErrorActionPreference='Stop'
 . (Join-Path $PSScriptRoot 'InstallerSupport.ps1')

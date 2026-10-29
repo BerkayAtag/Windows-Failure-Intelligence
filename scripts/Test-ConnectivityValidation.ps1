@@ -1,4 +1,4 @@
-$ErrorActionPreference='Stop'
+﻿$ErrorActionPreference='Stop'
 $tokens=$null;$parseErrors=$null
 $ast=[Management.Automation.Language.Parser]::ParseFile((Join-Path $PSScriptRoot 'Test-WfiConnectivity.ps1'),[ref]$tokens,[ref]$parseErrors)
 if($parseErrors.Count){throw 'Connectivity script syntax errors.'}

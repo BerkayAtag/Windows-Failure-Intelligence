@@ -1,4 +1,4 @@
-#Requires -Version 5.1
+﻿#Requires -Version 5.1
 param([Parameter(Mandatory)][string]$PostgresBin,[ValidateRange(1024,65535)][int]$Port=35441)
 $ErrorActionPreference='Stop'
 $pgPort=$Port

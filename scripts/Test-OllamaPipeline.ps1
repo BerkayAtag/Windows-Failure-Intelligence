@@ -1,4 +1,4 @@
-param([string]$BaseUrl='http://127.0.0.1:5080',[switch]$BigFix)
+﻿param([string]$BaseUrl='http://127.0.0.1:5080',[switch]$BigFix)
 $ErrorActionPreference='Stop'
 $uri=[uri]$BaseUrl
 if (-not $uri.IsLoopback) { throw 'This synthetic smoke test is restricted to loopback development servers.' }

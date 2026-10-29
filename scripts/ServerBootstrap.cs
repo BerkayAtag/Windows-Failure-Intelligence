@@ -10,7 +10,12 @@ using System.Windows.Forms;
 
 [assembly: AssemblyCompany("Berkay Atağ")]
 [assembly: AssemblyProduct("WFI")]
-[assembly: AssemblyFileVersion("0.6.0.6")]
+[assembly: AssemblyFileVersion("0.7.0.0")]
+[assembly: AssemblyVersion("0.7.0.0")]
+[assembly: AssemblyInformationalVersion("0.7.0")]
+[assembly: AssemblyTitle("WFI Server Setup")]
+[assembly: AssemblyDescription("Windows Failure Intelligence (WFI)")]
+[assembly: AssemblyCopyright("© 2026 Berkay Atağ")]
 internal static class ServerBootstrap
 {
     [STAThread]
@@ -40,7 +45,7 @@ internal static class ServerBootstrap
             start.UseShellExecute=false;start.WorkingDirectory=root;start.CreateNoWindow=true;
             start.EnvironmentVariables["WFI_SETUP_SOURCE"]=Path.GetDirectoryName(Assembly.GetExecutingAssembly().Location);
             if(args.Length!=0)throw new ArgumentException("Server setup is interactive; use Install-Server.ps1 for unattended deployment.");
-            start.Arguments="-NoProfile -STA -File "+Quote(Path.Combine(root,"scripts","Setup-Server.ps1"));
+            start.Arguments="-NoProfile -ExecutionPolicy Bypass -STA -File "+Quote(Path.Combine(root,"scripts","Setup-Server.ps1"));
             using(var process=Process.Start(start)){process.WaitForExit();return process.ExitCode;}
         }
         catch{if(!silent)MessageBox.Show("Kurulum paketi açılamadı. Yönetici yetkisini, disk alanını ve paket bütünlüğünü kontrol edin.","WFI Setup");return 10;}

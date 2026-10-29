@@ -1,3 +1,21 @@
+# 0.7.0 — 30 Ekim 2026 güvenlik ve hata incelemesi
+
+Kaynak incelemesiyle bulunan ve davranış regresyonlarıyla doğrulanan düzeltmeler:
+
+| Bulgu | Etki | Düzeltme | Regresyon |
+|---|---|---|---|
+| `GET /api/v1/remediations/{id}` başka domain kaydı için 403 dönüyordu | Kayıt kimliğinin varlığı domain dışına sızıyordu | Sorgu domain filtresiyle yapılır, yoksa 404 | Mevcut JobTransition/API testleri |
+| `GET /api/v1/incidents/{id}` AI özetini domain filtresiz okuyordu | Bozuk bağlantıda başka domain özeti dönebilirdi | AI analizi de oturum domain'iyle sınırlı | Derleme + API testleri |
+| `POST /api/v1/remediations` makine adını doğrulamıyor/normalize etmiyordu | Büyük harfli adla 404, kayıt satırında ham değer | Ad regex ile doğrulanır, küçük harfe çevrilir, kayıtta cihazın adı kullanılır | JobTransition testleri |
+| İptal edilen cihazın bekleyen teşhisleri kuyrukta kalıyordu | Domain teşhis kapasitesi kalıcı tükenebilirdi | İptal tek transaction'da bekleyen/çalışan teşhisi kapatır, başlamamış onarımı iptal eder | `RevokedOrExpiredRegistrationIsReissuedOnSameIdentity` |
+| İptal edilen makine yeniden kaydedilemiyordu | Yeniden kurulum için manuel DB müdahalesi gerekirdi | Revoked veya süresi dolmuş kullanılmamış kayıt aynı kimlikle yeni token alır; online ajan ve taze bekleyen kayıt korunur, eski kimlik geçersiz kalır | `ExpiredUnusedRegistrationIsReissuedButFreshOneIsNot` |
+| Kurucu/kaldırıcı PowerShell'i ExecutionPolicy vermeden başlatıyordu | Restricted varsayılanında kurulum başlamayabilirdi | Yalnız süreç kapsamında `-ExecutionPolicy Bypass`; makine politikası değişmez, GPO zorlaması geçerli kalır | Kurulum betik testleri |
+| Konsoldaki sessiz kurulum örneği sabit kurum adresi içeriyordu | Yanlış sunucuya yönlendirme, ekran görüntüsünde kurum adı | Konsolun gerçek HTTPS origin'i kullanılır | Playwright `deployment.spec.ts` |
+
+Değişmeyen güvenlik sınırları: oturum çerezi HttpOnly/Secure/SameSite=Strict, CSRF, giriş hız sınırı, CSP, PBKDF2 600000 yerel yönetici, LDAP filtre kaçışı ve security-group zorlaması, ajan kimliği SHA-256 özetiyle saklanır, PostgreSQL/Ollama yalnız loopback. Ajan kurucusu artık Windows PowerShell 5.1 ile çalışır; token yine stdin'den alınır, komut satırına yazılmaz ve BSTR hemen sıfırlanır.
+
+Ölçülmeyenler: gerçek AD/LDAPS, Windows Server VM'de uçtan uca kurulum/kaldırma, HA ve kapasite. Bu inceleme sıfır güvenlik açığı iddiası değildir.
+
 # 0.6.0-preview.6 — 29 Ekim 2026
 
 Güncel kurulum sürümü **preview.6**. Önceki preview.4/5 kurucularını kullanmayın: Windows PowerShell 5.1'in standart girdi kodlaması SQL aktarımını bozabiliyordu. Kurucu artık SQL'i UTF-8 baytlarıyla gönderir. Gerçek PostgreSQL'de PowerShell 5.1 üzerinden ilk/tekrarlı rol-veritabanı hazırlığı, tam şema ve Türkçe metin roundtrip testi geçti. Kalıcı regresyon: `scripts/Test-ServerSqlTransport.ps1`; `Test-Postgres.ps1` bunu da çalıştırır. İnternet gereksinimi ve açık Windows VM kabul kapısı değişmedi.
