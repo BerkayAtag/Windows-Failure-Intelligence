@@ -1,3 +1,7 @@
+# 0.6.0-preview.5 — 29 Ekim 2026
+
+Otomatik kurulum ve yerel yönetici özelliklerini, UTF-8/DNS düzeltmelerini içerir. Yayın kontrolü artık sürüm etiketi ile derlenen kaynak commit'inin aynı olmasını zorunlu tutar; başka kaynak sürümünün dosyaları mevcut sürüm üzerine yüklenmez. Güncel indirme preview.5'tir. Windows VM kabulü hâlâ açıktır.
+
 # İstemci ve operatör kurulumu — 0.5.0 pilot
 
 ## Sunucu kurulumuyla uyum — 0.6.0-preview.4

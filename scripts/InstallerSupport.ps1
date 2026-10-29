@@ -15,7 +15,7 @@ function Get-WfiUninstallProperties([string]$Product,[string]$InstallPath) {
     if($Product -notin @('Agent','Server')){throw 'Unknown WFI product.'}
     $full=Assert-WfiSafePath $InstallPath
     return @{
-        DisplayName="WFI $Product"; Publisher=("Berkay Ata"+[char]0x011F); DisplayVersion='0.6.0-preview.4'
+        DisplayName="WFI $Product"; Publisher=("Berkay Ata"+[char]0x011F); DisplayVersion='0.6.0-preview.5'
         DisplayIcon=('"'+(Join-Path $full 'wfi.ico')+'",0'); InstallLocation=$full
         UninstallString=('"'+(Join-Path $full 'WFI-Uninstall.exe')+'"')
         NoModify=1; NoRepair=1
