@@ -1,3 +1,7 @@
+# 0.6.0-preview.6 — 29 Ekim 2026
+
+Güncel kurulum sürümü **preview.6**. Önceki preview.4/5 kurucularını kullanmayın: Windows PowerShell 5.1'in standart girdi kodlaması SQL aktarımını bozabiliyordu. Kurucu artık SQL'i UTF-8 baytlarıyla gönderir. Gerçek PostgreSQL'de PowerShell 5.1 üzerinden ilk/tekrarlı rol-veritabanı hazırlığı, tam şema ve Türkçe metin roundtrip testi geçti. Kalıcı regresyon: `scripts/Test-ServerSqlTransport.ps1`; `Test-Postgres.ps1` bunu da çalıştırır. İnternet gereksinimi ve açık Windows VM kabul kapısı değişmedi.
+
 # Güvenlik incelemesi ve düzeltmeler — 22 Ekim 2026
 
 ## 0.6.0-preview.4 kurulum incelemesi

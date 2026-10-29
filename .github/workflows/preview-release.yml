@@ -31,19 +31,19 @@ jobs:
         run: |
           ./scripts/Package.ps1
 
-          $paths=@('artifacts/WFI-Server-Setup.exe','artifacts/WFI-0.6.0-preview.5-pilot.zip')
+          $paths=@('artifacts/WFI-Server-Setup.exe','artifacts/WFI-0.6.0-preview.6-pilot.zip')
           $paths | ForEach-Object { $hash=Get-FileHash -LiteralPath $_ -Algorithm SHA256; "$($hash.Hash.ToLowerInvariant())  $(Split-Path $_ -Leaf)" } | Set-Content artifacts/SHA256SUMS.txt
       - name: Publish development preview
         shell: pwsh
         env:
           GH_TOKEN: ${{ github.token }}
         run: |
-          gh release view v0.6.0-preview.5 --json tagName *> $null
+          gh release view v0.6.0-preview.6 --json tagName *> $null
           if($LASTEXITCODE -ne 0) {
-            gh release create v0.6.0-preview.5 --target '${{ github.sha }}' --prerelease --title 'WFI 0.6.0-preview.5' --notes-file docs/release-preview.md
+            gh release create v0.6.0-preview.6 --target '${{ github.sha }}' --prerelease --title 'WFI 0.6.0-preview.6' --notes-file docs/release-preview.md
             if($LASTEXITCODE -ne 0){throw 'Release creation failed'}
           }
-          $tagCommit=gh api "repos/$env:GITHUB_REPOSITORY/git/ref/tags/v0.6.0-preview.5" --jq '.object.sha'
+          $tagCommit=gh api "repos/$env:GITHUB_REPOSITORY/git/ref/tags/v0.6.0-preview.6" --jq '.object.sha'
           if($LASTEXITCODE -ne 0 -or $tagCommit.Trim() -ne $env:GITHUB_SHA){throw 'Release tag differs from build commit. Increment the preview version; never replace assets from another commit.'}
-          gh release upload v0.6.0-preview.5 artifacts/WFI-Server-Setup.exe artifacts/WFI-0.6.0-preview.5-pilot.zip artifacts/SHA256SUMS.txt --clobber
+          gh release upload v0.6.0-preview.6 artifacts/WFI-Server-Setup.exe artifacts/WFI-0.6.0-preview.6-pilot.zip artifacts/SHA256SUMS.txt --clobber
           if($LASTEXITCODE -ne 0){throw 'Release upload failed'}

@@ -11,6 +11,9 @@ $options.DataPath='C:relative';Reject {Assert-WfiSetupOptions $options};$options
 $options.DataPath='C:\Wfi[bad]';Reject {Assert-WfiSetupOptions $options};$options.DataPath='C:\Wfi-Synthetic-Data'
 $options.CertificateThumbprint='invalid';Reject {Assert-WfiSetupOptions $options};$options.CertificateThumbprint=''
 $options.PasswordHash='pbkdf2-sha256:1:AA==:AA==';Reject {Assert-WfiSetupOptions $options}
+$port=Get-WfiAvailablePostgresPort
+$listener=[Net.Sockets.TcpListener]::new([Net.IPAddress]::Loopback,$port)
+try{$listener.Server.ExclusiveAddressUse=$true;$listener.Start();if((Get-WfiAvailablePostgresPort) -eq $port){throw 'Occupied database port was reused.'}}finally{$listener.Stop()}
 $root=Join-Path ([IO.Path]::GetTempPath()) ('wfi-auto-test-'+[guid]::NewGuid().ToString('N'))
 [void][IO.Directory]::CreateDirectory($root)
 try {

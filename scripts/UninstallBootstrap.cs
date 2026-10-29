@@ -5,7 +5,7 @@ using System.Windows.Forms;
 using System.Reflection;
 [assembly: AssemblyCompany("Berkay Atağ")]
 [assembly: AssemblyProduct("WFI")]
-[assembly: AssemblyFileVersion("0.6.0.5")]
+[assembly: AssemblyFileVersion("0.6.0.6")]
 internal static class UninstallBootstrap {
  [STAThread] static int Main(string[] args) {
   try {

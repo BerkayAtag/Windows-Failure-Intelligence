@@ -23,6 +23,14 @@ function New-WfiRandomSecret {
     $bytes=New-Object byte[] 32;$rng=[Security.Cryptography.RandomNumberGenerator]::Create()
     try{$rng.GetBytes($bytes);return ([BitConverter]::ToString($bytes)).Replace('-','')}finally{$rng.Dispose()}
 }
+function Get-WfiAvailablePostgresPort {
+    foreach($port in (@(55432)+@(35432..35531))) {
+        $listener=[Net.Sockets.TcpListener]::new([Net.IPAddress]::Loopback,$port)
+        try{$listener.Server.ExclusiveAddressUse=$true;$listener.Start();return $port}catch{# Reserved/occupied ports are skipped, never reconfigured.
+        }finally{$listener.Stop()}
+    }
+    throw 'No available dedicated PostgreSQL loopback port was found.'
+}
 function Set-WfiProtectedDirectory([string]$Path,[string]$ServiceSid='') {
     [void](Assert-WfiSafePath $Path)
     [void][IO.Directory]::CreateDirectory($Path)

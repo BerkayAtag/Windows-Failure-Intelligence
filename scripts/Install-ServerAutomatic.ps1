@@ -9,6 +9,7 @@ $statusPath=Join-Path (Split-Path $OptionsPath -Parent) 'setup-status.txt'
 function Status([string]$Message){[IO.File]::WriteAllText($statusPath,$Message,[Text.Encoding]::UTF8)}
 $mutex=New-Object Threading.Mutex($false,'Global\WFI.Server.Setup')
 $locked=$false
+$pgPort=55432
 try {
     $locked=$mutex.WaitOne(0)
     if(!$locked){throw 'Another WFI setup is running.'}
@@ -22,17 +23,19 @@ try {
         if(!(Test-Path -LiteralPath $journal)){throw 'Data directory already exists without WFI setup identity. Choose a new directory.'}
         $state=Get-Content -LiteralPath $journal -Raw | ConvertFrom-Json
         if($state.Kind -ne 'WFI-Automatic-Server-v1' -or $state.InstallPath -ne $app -or $state.Hostname -ne $options.Hostname -or $state.Domain -ne $options.Domain){throw 'Resume settings do not match the original installation.'}
+        if($state.PostgresPort){$pgPort=[int]$state.PostgresPort;if($pgPort -lt 1024 -or $pgPort -gt 65535){throw 'Invalid saved database port.'}}
     } else {
         if(Test-Path -LiteralPath $app){throw 'Application directory already exists.'}
         $drive=[IO.DriveInfo]::new([IO.Path]::GetPathRoot($data))
         if($drive.AvailableFreeSpace -lt 15GB){throw 'At least 15 GB free space is required on the selected data drive.'}
         foreach($name in @('WFI.PostgreSQL','WFI.Ollama')){if(Get-Service $name -ErrorAction SilentlyContinue){throw "Existing service: $name"}}
-        foreach($port in @(55432,11435)){
+        $pgPort=Get-WfiAvailablePostgresPort
+        foreach($port in @(11435)){
             $listener=[Net.Sockets.TcpListener]::new([Net.IPAddress]::Loopback,$port)
             try{$listener.Server.ExclusiveAddressUse=$true;$listener.Start()}catch{throw "Local port $port is occupied or reserved by Windows."}finally{$listener.Stop()}
         }
         Set-WfiProtectedDirectory $data
-        $state=[pscustomobject]@{Kind='WFI-Automatic-Server-v1';InstallPath=$app;Hostname=$options.Hostname;Domain=$options.Domain;OwnerPassword=(New-WfiRandomSecret);AppPassword=(New-WfiRandomSecret);DatabaseReady=$false;SchemaReady=$false}
+        $state=[pscustomobject]@{Kind='WFI-Automatic-Server-v1';InstallPath=$app;Hostname=$options.Hostname;Domain=$options.Domain;PostgresPort=$pgPort;OwnerPassword=(New-WfiRandomSecret);AppPassword=(New-WfiRandomSecret);DatabaseReady=$false;SchemaReady=$false}
         $state | ConvertTo-Json | Set-Content -LiteralPath $journal -Encoding UTF8
     }
     Status '1/7 - Prerequisite packages: downloading and verifying. This can take several minutes.'
@@ -76,7 +79,7 @@ try {
         [IO.File]::WriteAllText($pwfile,$state.OwnerPassword,[Text.Encoding]::ASCII)
         try{Invoke-WfiExecutable (Join-Path $pg 'initdb.exe') @('-D',$cluster,'-U','wfi_owner','--auth-host=scram-sha-256','--auth-local=scram-sha-256',('--pwfile='+$pwfile),'--encoding=UTF8','--locale=C')}
         finally{if(Test-Path $pwfile){Remove-Item -LiteralPath $pwfile -Force}}
-        Add-Content (Join-Path $cluster 'postgresql.conf') "`nlisten_addresses = '127.0.0.1'`nport = 55432`npassword_encryption = 'scram-sha-256'"
+        Add-Content (Join-Path $cluster 'postgresql.conf') "`nlisten_addresses = '127.0.0.1'`nport = $pgPort`npassword_encryption = 'scram-sha-256'"
     }
     function EnsureService([string]$Name,[string]$Binary) {
         $existing=Get-CimInstance Win32_Service -Filter ("Name='"+$Name+"'")
@@ -96,13 +99,21 @@ try {
     Start-Service 'WFI.PostgreSQL'
     function Sql([string]$Database,[string]$Text) {
         $start=New-Object Diagnostics.ProcessStartInfo
-        $start.FileName=Join-Path $pg 'psql.exe';$start.Arguments='-X -w -h 127.0.0.1 -p 55432 -U wfi_owner -d '+$Database+' --set=ON_ERROR_STOP=1'
+        $start.FileName=Join-Path $pg 'psql.exe';$start.Arguments='-X -w -h 127.0.0.1 -p '+$pgPort+' -U wfi_owner -d '+$Database+' --set=ON_ERROR_STOP=1'
         $start.UseShellExecute=$false;$start.CreateNoWindow=$true;$start.RedirectStandardInput=$true;$start.RedirectStandardOutput=$true;$start.RedirectStandardError=$true
         $start.EnvironmentVariables['PGPASSWORD']=$state.OwnerPassword
         $start.EnvironmentVariables['PGCLIENTENCODING']='UTF8'
         $start.EnvironmentVariables['PGOPTIONS']='-c statement_timeout=120000 -c lock_timeout=10000'
         $p=[Diagnostics.Process]::Start($start)
-        try{$out=$p.StandardOutput.ReadToEndAsync();$err=$p.StandardError.ReadToEndAsync();$p.StandardInput.Write($Text);$p.StandardInput.Close();if(!$p.WaitForExit(130000)){$p.Kill();$p.WaitForExit();throw 'Database command timed out.'};if($p.ExitCode -ne 0){throw 'Database provisioning failed; credentials and SQL were suppressed.'}}
+        try{
+            $out=$p.StandardOutput.ReadToEndAsync();$err=$p.StandardError.ReadToEndAsync()
+            # Framework PowerShell uses the console code page for StandardInput's writer.
+            # Write explicit UTF8 bytes so PostgreSQL receives the declared encoding.
+            $bytes=[Text.Encoding]::UTF8.GetBytes($Text)
+            $p.StandardInput.BaseStream.Write($bytes,0,$bytes.Length);$p.StandardInput.BaseStream.Close()
+            if(!$p.WaitForExit(130000)){$p.Kill();$p.WaitForExit();throw 'Database command timed out.'}
+            if($p.ExitCode -ne 0){throw 'Database provisioning failed; credentials and SQL were suppressed.'}
+        }
         finally{$p.Dispose()}
     }
     if(!$state.DatabaseReady){
@@ -137,7 +148,7 @@ try {
         $store=[Security.Cryptography.X509Certificates.X509Store]::new('Root','LocalMachine');$store.Open('ReadWrite')
         try{$store.Add([Security.Cryptography.X509Certificates.X509Certificate2]::new($cert.Export('Cert')))}finally{$store.Close()}
     }
-    $config=@{AllowedHosts=$options.Hostname;ConnectionStrings=@{Wfi=('Host=127.0.0.1;Port=55432;Database=wfi;Username=wfi_app;Password='+$state.AppPassword+';SSL Mode=Disable')};Ldap=@{Enabled=$false;Domain=$options.Domain;Server='';BaseDn=(($options.Domain.Split('.') | ForEach-Object {'DC='+$_}) -join ',');GroupRoles=@{}};LocalAdmin=@{Enabled=$true;PasswordHash=$options.PasswordHash};Demo=@{Enabled=$false};Worker=@{Enabled=$true};Storage=@{Path=(Join-Path $data 'evidence')};DataProtection=@{Path=(Join-Path $data 'keys')};Ollama=@{BaseUrl='http://127.0.0.1:11435';DefaultModel='phi4-mini:latest';MaxConcurrent=1};HighAvailability=@{Enabled=$false}}
+    $config=@{AllowedHosts=$options.Hostname;ConnectionStrings=@{Wfi=('Host=127.0.0.1;Port='+$pgPort+';Database=wfi;Username=wfi_app;Password='+$state.AppPassword+';SSL Mode=Disable')};Ldap=@{Enabled=$false;Domain=$options.Domain;Server='';BaseDn=(($options.Domain.Split('.') | ForEach-Object {'DC='+$_}) -join ',');GroupRoles=@{}};LocalAdmin=@{Enabled=$true;PasswordHash=$options.PasswordHash};Demo=@{Enabled=$false};Worker=@{Enabled=$true};Storage=@{Path=(Join-Path $data 'evidence')};DataProtection=@{Path=(Join-Path $data 'keys')};Ollama=@{BaseUrl='http://127.0.0.1:11435';DefaultModel='phi4-mini:latest';MaxConcurrent=1};HighAvailability=@{Enabled=$false}}
     $configPath=Join-Path $data 'installation-config.json';$config | ConvertTo-Json -Depth 10 | Set-Content $configPath -Encoding UTF8
     Status '6/7 - Installing WFI web application.'
     & (Join-Path $PSScriptRoot 'Install-Server.ps1') -PackagePath $package -ConfigurationPath $configPath -Hostname $options.Hostname -CertificateThumbprint $thumb -InstallPath $app

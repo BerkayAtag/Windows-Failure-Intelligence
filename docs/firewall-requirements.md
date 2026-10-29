@@ -1,3 +1,9 @@
+# 0.6.0-preview.6 — 29 Ekim 2026
+
+PostgreSQL varsayılan 55432 portu Windows tarafından ayrılmış veya doluysa kurucu 35432–35531 aralığından uygun bir loopback portunu otomatik seçip yapılandırmaya kaydeder; ağdan DB erişimi açılmaz.
+
+Güncel kurulum sürümü **preview.6**. Önceki preview.4/5 kurucularını kullanmayın: Windows PowerShell 5.1'in standart girdi kodlaması SQL aktarımını bozabiliyordu. Kurucu artık SQL'i UTF-8 baytlarıyla gönderir. Gerçek PostgreSQL'de PowerShell 5.1 üzerinden ilk/tekrarlı rol-veritabanı hazırlığı, tam şema ve Türkçe metin roundtrip testi geçti. Kalıcı regresyon: `scripts/Test-ServerSqlTransport.ps1`; `Test-Postgres.ps1` bunu da çalıştırır. İnternet gereksinimi ve açık Windows VM kabul kapısı değişmedi.
+
 # 0.6.0-preview.5 — 29 Ekim 2026
 
 Otomatik kurulum ve yerel yönetici özelliklerini, UTF-8/DNS düzeltmelerini içerir. Yayın kontrolü artık sürüm etiketi ile derlenen kaynak commit'inin aynı olmasını zorunlu tutar; başka kaynak sürümünün dosyaları mevcut sürüm üzerine yüklenmez. Güncel indirme preview.5'tir. Windows VM kabulü hâlâ açıktır.

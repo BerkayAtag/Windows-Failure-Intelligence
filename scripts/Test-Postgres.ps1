@@ -33,3 +33,7 @@ try {
     if($started){& (Join-Path $bin 'pg_ctl.exe') -D $data -m fast -w stop}
     Write-Host "Sentetik test cluster/log dizini: $runRoot"
 }
+
+# Verify the actual installer SQL transport under Windows PowerShell 5.1, not only Npgsql.
+& (Join-Path $env:WINDIR "System32/WindowsPowerShell/v1.0/powershell.exe") -NoProfile -File (Join-Path $PSScriptRoot "Test-ServerSqlTransport.ps1") -PostgresBin $bin -Port $Port
+if($LASTEXITCODE -ne 0){throw "Installer SQL transport regression failed."}

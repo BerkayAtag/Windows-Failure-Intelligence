@@ -1,10 +1,12 @@
 # Windows Failure Intelligence
 
-Kurulum düzeltmesi: Windows PowerShell 5.1 altında SQL UTF-8 olarak okunur ve PostgreSQL istemci kodlaması UTF8 seçilir; Türkçe katalog metinleri korunur. DNS sorgusu başarısızsa sihirbaz makine adıyla açılır. Sunucunun DNS domain bilgisi varsa domain alanına otomatik alınır ve değiştirilebilir.
+PostgreSQL varsayılan 55432 portu Windows tarafından ayrılmış veya doluysa kurucu 35432–35531 aralığından uygun bir loopback portunu otomatik seçip yapılandırmaya kaydeder; ağdan DB erişimi açılmaz.
 
-**0.6.0-preview.5 · Kırmızı-beyaz tasarım, karanlık tema ve Onarım Otomasyonu.**
+Önceki preview.4/5 kurucuları yerine preview.6 kullanın. Kurulum düzeltmesi: Windows PowerShell 5.1 altında SQL UTF-8 olarak okunur ve PostgreSQL istemci kodlaması UTF8 seçilir; Türkçe katalog metinleri korunur. DNS sorgusu başarısızsa sihirbaz makine adıyla açılır. Sunucunun DNS domain bilgisi varsa domain alanına otomatik alınır ve değiştirilebilir.
 
-[Tanıtım sitesi](https://BerkayAtag.github.io/Windows-Failure-Intelligence/) · [Sunucu kurulumu](https://github.com/BerkayAtag/Windows-Failure-Intelligence/releases/tag/v0.6.0-preview.5) · [Kurulum](docs/server-installation.md) · [Firewall](docs/firewall-requirements.md)
+**0.6.0-preview.6 · Kırmızı-beyaz tasarım, karanlık tema ve Onarım Otomasyonu.**
+
+[Tanıtım sitesi](https://BerkayAtag.github.io/Windows-Failure-Intelligence/) · [Sunucu kurulumu](https://github.com/BerkayAtag/Windows-Failure-Intelligence/releases/tag/v0.6.0-preview.6) · [Kurulum](docs/server-installation.md) · [Firewall](docs/firewall-requirements.md)
 
 ![WFI analiz merkezi — sentetik tanıtım oturumu](site/assets/console.png)
 
@@ -224,7 +226,7 @@ Kaynak: https://github.com/BerkayAtag/Windows-Failure-Intelligence
 Paketler: https://github.com/BerkayAtag/Windows-Failure-Intelligence/releases/tag/v0.6.0-preview.2
 
 GitHub Actions temiz Windows ortamında kurulum paketlerini üretti ve yayımladı. Sunucu EXE, ajan EXE, pilot ZIP ve SHA256SUMS.txt bağlantıları HTTP 200 döndü; üç paket için GitHub asset digest değerleri SHA256SUMS ile eşleşti. Bu kontrol gerçek Windows kurulumu veya Authenticode yayıncı doğrulaması değildir. İlk ayrı CI çalışmasındaki PowerShell cold-start timeout için sentetik testin iki işlemine ayrı 60 saniye bütçe verildi; üretim onarım timeout'u değişmedi.
-## 0.6.0-preview.5 — 29 Ekim 2026
+## 0.6.0-preview.6 — 29 Ekim 2026
 
 - Yeni oturumlarda kırmızı-beyaz aydınlık tema varsayılan; sağ üstten karanlık tema seçimi kalıcıdır. Standart seçimi eski tercihler için aydınlık tasarımın uyumlu seçeneği olarak korunur. Onarım Kampanyaları ekranı Onarım Otomasyonu olarak adlandırıldı; API ve politika sınırları değişmedi.
 - Sunucu ve istemci setup EXE'leri kırmızı WFI simgesi taşır. Kurulumdan sonra appwiz.cpl içinde WFI Server / WFI Agent, Publisher: Berkay Atağ, sürüm ve simge kaydedilir. Publisher metni Authenticode imzası değildir; paketler imzasız pilot sürümdür.
@@ -237,10 +239,10 @@ GitHub Actions temiz Windows ortamında kurulum paketlerini üretti ve yayımlad
 
 ### Yayın ve son doğrulama — 29 Ekim 2026
 
-0.6.0-preview.5 yayımlandı: https://github.com/BerkayAtag/Windows-Failure-Intelligence/releases/tag/v0.6.0-preview.5
+0.6.0-preview.6 yayımlandı: https://github.com/BerkayAtag/Windows-Failure-Intelligence/releases/tag/v0.6.0-preview.6
 Canlı tanıtım: https://berkayatag.github.io/Windows-Failure-Intelligence/
 GitHub temiz Windows doğrulaması başarılı: https://github.com/BerkayAtag/Windows-Failure-Intelligence/actions/runs/40805030864
 
 213/213 .NET, 13/13 Playwright ve PostgreSQL 17 üzerinde 2/2 test geçti. İlk PostgreSQL denemesinde 55439 portu Windows tarafından reddedildi; çıktısı dosyaya yönlendirilmiş ikinci koşu beklediği için yalnız o sentetik cluster durduruldu. 35440 portunda normal çıktı ile temiz tekrar 2/2 geçti ve cluster kapatıldı. Bu durum kapasite/HA kabulü değildir.
 
-NuGet ve pnpm taramaları bilinen zafiyet bildirmedi. İndirilen sunucu EXE'sinin SHA256 değeri GitHub digest ile eşleşti; CompanyName Berkay Atağ ve FileVersion 0.6.0.5 okundu. Canlı sitede 1440/390/768px, görseller, menü bağlantısı, güncel sürüm, © 2026 Berkay Atağ · WFI altbilgisi ve ayrı client download bağlantısının kaldırılması doğrulandı. Gerçek Windows VM appwiz/kurulum/kaldırma ve AD/HA kabulü halen açık; imzasız EXE'deki Publisher alanı sertifika değildir.
+NuGet ve pnpm taramaları bilinen zafiyet bildirmedi. İndirilen sunucu EXE'sinin SHA256 değeri GitHub digest ile eşleşti; CompanyName Berkay Atağ ve FileVersion 0.6.0.6 okundu. Canlı sitede 1440/390/768px, görseller, menü bağlantısı, güncel sürüm, © 2026 Berkay Atağ · WFI altbilgisi ve ayrı client download bağlantısının kaldırılması doğrulandı. Gerçek Windows VM appwiz/kurulum/kaldırma ve AD/HA kabulü halen açık; imzasız EXE'deki Publisher alanı sertifika değildir.
