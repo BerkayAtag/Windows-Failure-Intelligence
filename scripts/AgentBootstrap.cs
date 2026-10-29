@@ -10,7 +10,7 @@ using System.Windows.Forms;
 
 [assembly: AssemblyCompany("Berkay Atağ")]
 [assembly: AssemblyProduct("WFI")]
-[assembly: AssemblyFileVersion("0.6.0.3")]
+[assembly: AssemblyFileVersion("0.6.0.4")]
 internal static class AgentBootstrap
 {
     [STAThread]

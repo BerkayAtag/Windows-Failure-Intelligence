@@ -1,5 +1,12 @@
 # Güvenlik incelemesi ve düzeltmeler — 22 Ekim 2026
 
+## 0.6.0-preview.4 kurulum incelemesi
+
+Yerel yönetici açık `local:admin` adıyla sınırlıdır, yanlış kimlik/parolada LDAP'a düşmez. PBKDF2-SHA256 600000 iterasyon, rastgele 32 bayt salt, sabit süreli karşılaştırma; değişen hash/devre dışı hesapta cookie reddi. Mevcut CSRF, rol ve domain kontrolleri korunur. İndirme manifesti hash sabitler; Microsoft kurucuları imza denetiminden geçer. Otomatik kurulumdaki DB/AI loopback, ayrı servis kimliği; uygulama DB hesabı DDL yetkisizdir. İndirilen arşivde kök dışına yazma engellenir; yeniden kullanılan kurulum kökü yalnız SYSTEM/Administrators erişimiyle kabul edilir.
+
+Bozulmuş kaldırma betiği onarıldı. Otomatik serviste kaldırma öncesi binary yolu ve kurulum kimliği denetlenir. Sentetik davranış regresyonları aşağıdaki güncel doğrulama raporunda listelenir. Gerçek Windows VM/AD kabulü ve imzalı WFI dağıtımı açık; bu rapor sıfır açık garantisi değildir.
+
+
 ## 0.5.0 güvenlik sınırları
 
 Bootstrap yükü EXE kaynağına gömülüdür; açılım Program Files altında yeni ve kısıtlı ACL'li dizindedir. ZIP yolları hedef dışına çıkamaz, mevcut dosya üzerine çıkarılmaz. Sessiz mod parola/token argümanı kabul etmez; token dosyası reparse, boyut, içerik, sahip ve erişim kalıtımı kontrollerinden geçer. Bootstrap ve modern kurucu yönetici yetkisi ister; UAC atlatılmaz. EXE Authenticode imzasızdır.

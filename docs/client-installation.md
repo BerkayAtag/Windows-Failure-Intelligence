@@ -1,5 +1,10 @@
 # İstemci ve operatör kurulumu — 0.5.0 pilot
 
+## Sunucu kurulumuyla uyum — 0.6.0-preview.4
+
+Yeni sunucu sihirbazı ilk yönetici hesabını `local:admin` olarak oluşturur; LDAP sonradan yapılandırılabilir. Ajan EXE'sini oturum açılan **Ajan ve Ağ Erişimleri** menüsünden indirin. Sunucunun otomatik yerel sertifikası istemcide kendiliğinden güvenilir olmaz: kurum CA/GPO güven dağıtımını tamamlayın, HTTPS denetimini kapatmayın. İstemci için yeni inbound port gerekmez; sunucuya TCP/443 çıkışı yeterlidir. Sunucu bağımlılık kurulumu istemcinin PowerShell gereksinimini değiştirmez. İstemci sessiz kurulum parametreleri aşağıdaki gibidir.
+
+
 ## 0.5.0 — tek EXE ile kurulum
 
 Konsolda **Ajan ve Ağ Erişimleri → Ajan kurulumu → Windows ajanını indir** seçin. Artık ZIP açmanız gerekmez; indirilen WFI-Agent-Setup.exe tek dağıtım dosyasıdır. PowerShell 7 x64 ve Windows .NET Framework 4.8 ön koşuldur. Kurucu yönetici yetkisiyle açılır; kendi yükünü Program Files altında rastgele adlı, SYSTEM/Administrators dışında erişilemeyen dizine çıkarır ve işlem sonrasında temizler. Ajan .NET 10 runtime'ı dahildir. EXE imzasızdır; kurumsal dağıtımda Authenticode imzalama gerekir.

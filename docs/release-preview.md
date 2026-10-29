@@ -1,9 +1,9 @@
 WFI development preview: Windows endpoint diagnostics, local Ollama analysis, controlled remediation, pilot campaigns and BigFix central verification.
 
 Downloads:
-- WFI-Server-Setup.exe: interactive administrator setup. Prepare IIS, .NET 10 Hosting Bundle, PostgreSQL, TLS and a protected local configuration first. This installer does not install PostgreSQL/Ollama or apply production migrations.
+- WFI-Server-Setup.exe: Next / Install / Finish wizard for a NEW single-server pilot. Automatically downloads hash-pinned prerequisites, enables IIS, installs Hosting Bundle, creates dedicated loopback PostgreSQL/Ollama services and prepares schema during installation. Internet required, several GB download. Set local:admin password during setup; configure LDAP later. Real Windows VM installation acceptance remains open.
 - Client setup is included inside the server distribution and downloaded from the authenticated WFI console; no separate client EXE release asset.
-- WFI-0.6.0-preview.3-pilot.zip: deployment bundle, SQL and installation documentation.
+- WFI-0.6.0-preview.4-pilot.zip: deployment bundle, SQL and installation documentation.
 - SHA256SUMS.txt: integrity hashes, not publisher authentication.
 
 The EXEs are not Authenticode-signed. Use an isolated pilot environment. Real AD/BigFix integration, Windows VM installation and HA/40k endpoint capacity acceptance remain open. See docs/verification-current.md and docs/implementation-roadmap.md; this is not a zero-defect or production certification claim.

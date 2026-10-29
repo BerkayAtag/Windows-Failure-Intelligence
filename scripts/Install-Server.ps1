@@ -16,7 +16,9 @@ $source=(Resolve-Path -LiteralPath $PackagePath).Path
 [void](Assert-WfiSafePath $source)
 $configFile=(Resolve-Path -LiteralPath $ConfigurationPath).Path
 $settings=Get-Content -LiteralPath $configFile -Raw | ConvertFrom-Json
-if($settings.Demo.Enabled -ne $false -or -not $settings.ConnectionStrings.Wfi -or -not $settings.Ldap.Server) { throw 'Production DB/LDAP configuration and Demo.Enabled=false are required.' }
+$localReady=$settings.LocalAdmin.Enabled -eq $true -and $settings.LocalAdmin.PasswordHash -match '^pbkdf2-sha256:600000:[A-Za-z0-9+/]{43}=:[A-Za-z0-9+/]{43}=$'
+$ldapReady=$settings.Ldap.Enabled -ne $false -and $settings.Ldap.Server
+if($settings.Demo.Enabled -ne $false -or -not $settings.ConnectionStrings.Wfi -or (-not $localReady -and -not $ldapReady)) { throw 'Production DB and local administrator or LDAP configuration and Demo.Enabled=false are required.' }
 if(($settings | ConvertTo-Json -Depth 20) -match 'SET_LOCALLY|REPLACE|POSTGRES-FQDN') { throw 'Replace configuration placeholders locally before installation.' }
 if($Hostname -notin ([string]$settings.AllowedHosts).Split(';')) { throw 'Hostname must be explicitly present in AllowedHosts.' }
 $destination=[IO.Path]::GetFullPath($InstallPath)

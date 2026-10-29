@@ -1,3 +1,16 @@
+# 0.6.0-preview.4 — 29 Ekim 2026
+
+- .NET: **220/220** geçti. Yerel yönetici doğru/yanlış parola, açık hesap adı, LDAP kapalı davranışı, hatalı/aşırı iterasyonlu hash, CSRF zorunluluğu ve parola değişimi/devre dışı hesapta eski cookie reddi eklendi.
+- Playwright Chromium: **14/14** geçti. Yerel yönetici açıklaması, demo düğmesinin gizlenmesi, karanlık/mobil giriş ve önceki ajan/teşhis/onarım/tema akışları.
+- Gerçek PostgreSQL 17, ayrılmış geçici loopback cluster: **3/3** geçti. Önceki concurrency/migration/SQL kabullerine ek olarak kurucunun gerçek GRANT ifadeleriyle uygulama hesabının SELECT/DML yapabilmesi, CREATE TABLE ve CREATE DATABASE yapamaması doğrulandı. Cluster test sonrası durduruldu; Windows servisi kurulmadı.
+- PowerShell 5.1 otomatik kurulum yardımcı testleri geçti: kısa parola, geçersiz domain/hostname/sertifika, göreli/örtüşen/wildcard dizin, değiştirilmiş paket ve ZIP kök dışı giriş reddi; script parse kontrolü. Mevcut ajan kurucu 6 ve connectivity 12 sentetik senaryosu geçti.
+- pnpm audit ve 8 .NET projesinin transitif NuGet taraması bilinen zafiyet bildirmedi. Bu, tam güvenlik garantisi değildir. Önceki Codex Security başlatması uzun yerel PostgreSQL yolu nedeniyle rapor üretmemişti; bu sürüm için başarılı bulut taraması iddia edilmez.
+- Windows makinesine gerçek IIS/DB/Ollama kurulmadı. Sihirbazın temiz VM kurulumu, yeniden başlatma/yarım kurulum, servis kimlikleri, appwiz kaldırma ve gerçek AD/HA kabulü açık. 40 bin aktif cihaz kapasitesi ölçülmedi.
+- Sunucu kurucu çevrimiçi bootstrap'tir: bağımlılık/model indirir. Mevcut kurulum üstüne otomatik yükseltme veya tam rollback sağlamaz. Yerel HTTPS sertifikasının istemci güveni ayrıca dağıtılmalıdır.
+
+GitHub paketi/yayın doğrulaması yayın tamamlandıktan sonra kaydedilir.
+
+---
 # 0.6.0-preview.3 — 29 Ekim 2026
 
 - scripts/Build.ps1: 213/213 .NET testi; frontend, API, worker, istemci EXE ve sunucu EXE başarılı.

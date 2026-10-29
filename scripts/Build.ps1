@@ -2,6 +2,7 @@ $ErrorActionPreference = 'Stop'
 $projectRoot = Split-Path $PSScriptRoot -Parent
 & (Join-Path $PSScriptRoot 'Build-Branding.ps1')
 & (Join-Path $PSScriptRoot 'Test-InstallerMetadata.ps1')
+& (Join-Path $PSScriptRoot 'Test-ServerAutomaticSetup.ps1')
 & (Join-Path $PSScriptRoot 'Test-AgentInstaller.ps1')
 & (Join-Path $PSScriptRoot 'Test-ConnectivityValidation.ps1')
 . (Join-Path $PSScriptRoot 'Resolve-Dotnet.ps1')
@@ -21,6 +22,8 @@ try {
     if ($LASTEXITCODE -ne 0) { throw 'Testler başarısız.' }
     & $dotnetExe publish src/WFI.Api -c Release -o artifacts/api
     if ($LASTEXITCODE -ne 0) { throw 'API yayımlama paketi hazırlanamadı.' }
+    & $dotnetExe publish src/WFI.Ollama.Host -c Release -r win-x64 --self-contained false -o artifacts/ollama-host
+    if ($LASTEXITCODE -ne 0) { throw 'Ollama service host build failed.' }
     & $dotnetExe publish src/WFI.Worker -c Release -o artifacts/worker
     if ($LASTEXITCODE -ne 0) { throw 'Worker yayımlama paketi hazırlanamadı.' }
     & $dotnetExe publish src/WFI.Agent -c Release -r win-x64 --self-contained true -o artifacts/agent
@@ -45,7 +48,7 @@ try {
     & $compiler '/nologo' '/target:winexe' '/platform:x64' '/optimize+' '/reference:System.IO.Compression.dll' '/reference:System.IO.Compression.FileSystem.dll' '/reference:System.Windows.Forms.dll' "/win32manifest:$manifest" "/win32icon:$projectRoot/artifacts/branding/wfi.ico" "/resource:$payload,WfiPayload" "/out:$setupOutput" $bootstrap
     if($LASTEXITCODE -ne 0){throw 'Single-file agent setup build failed.'}
     $setupFile=Get-Item artifacts/api/distribution/WFI-Agent-Setup.exe
-    @{version='0.6.0-preview.3';size=$setupFile.Length;sha256=(Get-FileHash -LiteralPath $setupFile.FullName -Algorithm SHA256).Hash;platform='Windows x64';signed=$false} | ConvertTo-Json | Set-Content -LiteralPath artifacts/api/distribution/agent-manifest.json -Encoding utf8
+    @{version='0.6.0-preview.4';size=$setupFile.Length;sha256=(Get-FileHash -LiteralPath $setupFile.FullName -Algorithm SHA256).Hash;platform='Windows x64';signed=$false} | ConvertTo-Json | Set-Content -LiteralPath artifacts/api/distribution/agent-manifest.json -Encoding utf8
     Copy-Item -LiteralPath artifacts/api/distribution/WFI-Agent-Setup.exe,artifacts/api/distribution/agent-manifest.json -Destination src/WFI.Api/distribution -Force
 } finally { Pop-Location }
 

@@ -1,0 +1,6 @@
+{
+  "vc": {"file":"VC_redist.x64.exe","url":"https://download.visualstudio.microsoft.com/download/pr/990c720a-46ce-4dc7-87b9-c2eb615d34b9/CC0FF0EB1DC3F5188AE6300FAEF32BF5BEEBA4BDD6E8E445A9184072096B713B/VC_redist.x64.exe","algorithm":"SHA256","hash":"CC0FF0EB1DC3F5188AE6300FAEF32BF5BEEBA4BDD6E8E445A9184072096B713B"},
+  "hosting": {"file":"dotnet-hosting-10.0.14-win.exe","url":"https://builds.dotnet.microsoft.com/dotnet/aspnetcore/Runtime/10.0.14/dotnet-hosting-10.0.14-win.exe","algorithm":"SHA512","hash":"cc61e2a043319e2a8a4105cb6eb242855375ee5c165ed94478cb01330940139f5c100429317b31fa85d6a7d579df61cd929697371db78333b482474ceb9fd32f"},
+  "postgres": {"file":"postgresql-17.11-5-windows-x64-binaries.zip","url":"https://get.enterprisedb.com/postgresql/postgresql-17.11-5-windows-x64-binaries.zip","algorithm":"SHA256","hash":"80379B2C04D51C30225532E0AE04509899141E9957ED096FE749D7FD9DF8F82F"},
+  "ollama": {"file":"ollama-windows-amd64-v0.40.13.zip","url":"https://github.com/ollama/ollama/releases/download/v0.40.13/ollama-windows-amd64.zip","algorithm":"SHA256","hash":"7afa38624fa62ee5d8293422d0ab084c1bb4603134c7f4dafce11a033b57cc19"}
+}

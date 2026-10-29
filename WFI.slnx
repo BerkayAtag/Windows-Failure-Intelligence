@@ -5,6 +5,7 @@
     <Project Path="src/WFI.Api/WFI.Api.csproj" />
     <Project Path="src/WFI.Core/WFI.Core.csproj" />
     <Project Path="src/WFI.Infrastructure/WFI.Infrastructure.csproj" />
+    <Project Path="src/WFI.Ollama.Host/WFI.Ollama.Host.csproj" />
     <Project Path="src/WFI.Worker/WFI.Worker.csproj" />
   </Folder>
   <Folder Name="/tests/">

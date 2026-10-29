@@ -7,6 +7,7 @@ using Microsoft.Extensions.Options;
 namespace WFI.Infrastructure;
 public sealed class LdapOptions
 {
+    public bool Enabled { get; set; } = true;
     public string Domain { get; set; } = "example.invalid";
     public string Server { get; set; } = "";
     public int Port { get; set; } = 636;

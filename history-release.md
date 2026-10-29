@@ -1,3 +1,11 @@
+# 0.6.0-preview.4 — 29 Ekim 2026
+
+- Sunucu için grafik kurulum sihirbazı, otomatik bağımlılık hazırlığı, özel PostgreSQL/Ollama servisleri ve kurulum sırasında şema uygulama.
+- Kurulumda belirlenen yerel yönetici; LDAP sonradan etkinleştirilebilir. Yerel parola değişiminde oturum geçersizleştirme.
+- Hash ve Microsoft yayıncı doğrulaması, arşiv geçişi engeli, korunan kurulum günlüğü, ayrı veri dizini.
+- Bozulmuş kaldırma betiği düzeltildi; kurulumun sahip olduğu bağımlılık servisleri kaldırılır, veriler korunur.
+- Gerçek Windows VM kabulü henüz yapılmadı. İnternet gerekir; tam çevrimdışı veya otomatik yükseltme paketi değildir.
+
 # WFI sürüm geçmişi
 
 ## 0.6.0-preview.1 — 26 Ekim 2026 (geliştirme önizlemesi)

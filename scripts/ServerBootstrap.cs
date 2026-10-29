@@ -10,7 +10,7 @@ using System.Windows.Forms;
 
 [assembly: AssemblyCompany("Berkay Atağ")]
 [assembly: AssemblyProduct("WFI")]
-[assembly: AssemblyFileVersion("0.6.0.3")]
+[assembly: AssemblyFileVersion("0.6.0.4")]
 internal static class ServerBootstrap
 {
     [STAThread]
@@ -37,9 +37,10 @@ internal static class ServerBootstrap
                 using(var input=entry.Open())using(var output=new FileStream(path,FileMode.CreateNew,FileAccess.Write,FileShare.None))input.CopyTo(output);
             }
             var start=new ProcessStartInfo(Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.System),"WindowsPowerShell","v1.0","powershell.exe"));
-            start.UseShellExecute=false;start.WorkingDirectory=root;
+            start.UseShellExecute=false;start.WorkingDirectory=root;start.CreateNoWindow=true;
+            start.EnvironmentVariables["WFI_SETUP_SOURCE"]=Path.GetDirectoryName(Assembly.GetExecutingAssembly().Location);
             if(args.Length!=0)throw new ArgumentException("Server setup is interactive; use Install-Server.ps1 for unattended deployment.");
-            start.Arguments="-NoProfile -File "+Quote(Path.Combine(root,"scripts","Setup-Server.ps1"));
+            start.Arguments="-NoProfile -STA -File "+Quote(Path.Combine(root,"scripts","Setup-Server.ps1"));
             using(var process=Process.Start(start)){process.WaitForExit();return process.ExitCode;}
         }
         catch{if(!silent)MessageBox.Show("Kurulum paketi açılamadı. Yönetici yetkisini, disk alanını ve paket bütünlüğünü kontrol edin.","WFI Setup");return 10;}

@@ -32,7 +32,8 @@ builder.Services.Configure<ForwardedHeadersOptions>(o =>
 });
 builder.Services.Configure<LdapOptions>(builder.Configuration.GetSection("Ldap"));
 builder.Services.AddWfiDatabase(builder.Configuration, dev);
-builder.Services.AddSingleton<IAuthenticator, LdapAuthenticator>();
+builder.Services.Configure<LocalAdminOptions>(builder.Configuration.GetSection("LocalAdmin"));
+builder.Services.AddSingleton<IAuthenticator, InstallationAuthenticator>();
 builder.Services.AddScoped<AgentCoordinator>();
 builder.Services.AddScoped<RemediationCoordinator>();
 builder.Services.AddSingleton<IOllamaService, OllamaService>();
@@ -63,6 +64,9 @@ builder.Services.AddAuthentication(CookieAuthenticationDefaults.AuthenticationSc
     o.Events.OnRedirectToAccessDenied = c => { c.Response.StatusCode = 403; return Task.CompletedTask; };
     o.Events.OnValidatePrincipal = async c =>
     {
+        var localVersion = c.Principal?.FindFirstValue("local_credential_version");
+        var localOptions = c.HttpContext.RequestServices.GetRequiredService<IOptions<LocalAdminOptions>>().Value;
+        if(localVersion != null && (!localOptions.Enabled || localVersion != localOptions.CredentialVersion)) { c.RejectPrincipal(); return; }
         var sid = c.Principal?.FindFirstValue("session_id");
         var db = c.HttpContext.RequestServices.GetRequiredService<WfiDb>();
         if (sid == null || await db.Audit.AnyAsync(a => a.Action == "logout" && a.Target == sid, c.HttpContext.RequestAborted))
@@ -84,7 +88,14 @@ if (builder.Configuration.GetValue("Worker:Enabled", true) && !args.Contains("--
 var app = builder.Build();
 demo = dev && app.Configuration.GetValue<bool>("Demo:Enabled");
 if (!dev && app.Configuration.GetValue<bool>("Demo:Enabled")) throw new InvalidOperationException("Demo production ortamında kullanılamaz.");
-if (!demo && !args.Contains("--migrate")) app.Services.GetRequiredService<IOptions<LdapOptions>>().Value.Validate();
+if (!demo && !args.Contains("--migrate")) {
+    var ldapOptions=app.Services.GetRequiredService<IOptions<LdapOptions>>().Value;
+    var localOptions=app.Services.GetRequiredService<IOptions<LocalAdminOptions>>().Value;
+    localOptions.Validate();
+    if(ldapOptions.Enabled)ldapOptions.Validate();
+    if(!ldapOptions.Enabled&&!localOptions.Enabled)throw new InvalidOperationException("Enable LDAP or a configured local administrator.");
+    if(string.IsNullOrWhiteSpace(ldapOptions.Domain))throw new InvalidOperationException("A device domain is required.");
+}
 if (args.Contains("--migrate"))
 {
     using var scope = app.Services.CreateScope();
@@ -138,7 +149,7 @@ api.MapGet("/ready", async (WfiDb db, HttpContext c) =>
 });
 
 // Authentication
-api.MapGet("/auth/config", (IOptions<LdapOptions> o) => new { domain = o.Value.Domain, demo, configured = demo || !string.IsNullOrWhiteSpace(o.Value.Server) });
+api.MapGet("/auth/config", (IOptions<LdapOptions> o, IOptions<LocalAdminOptions> local) => new { domain = o.Value.Domain, demo, localAdmin = local.Value.Enabled, configured = demo || local.Value.Enabled || (o.Value.Enabled && !string.IsNullOrWhiteSpace(o.Value.Server)) });
 api.MapGet("/auth/csrf", (HttpContext c, IAntiforgery a) => new { token = a.GetAndStoreTokens(c).RequestToken });
 api.MapPost("/auth/login", async (LoginRequest input, HttpContext c, IAuthenticator auth, WfiDb db) =>
 {
@@ -491,7 +502,7 @@ api.MapPost("/analyses/upload", async (HttpContext c, WfiDb db, IConfiguration c
 }).RequireAuthorization("Analyze").RequireRateLimiting("upload");
 
 api.MapGet("/rules", () => Rules.All.Select(r => new { r.Id, version = Rules.Version, r.Category, r.Title, r.Explanation, r.Checks })).RequireAuthorization();
-api.MapGet("/connectors", (IOptions<LdapOptions> o, IBigFixConnector bigFix) => new { ldap = new { domain = o.Value.Domain, configured = !string.IsNullOrWhiteSpace(o.Value.Server), mode = "LDAPS", demo }, sccm = "not_configured", bigFix = bigFix.Configured ? "configured" : "not_configured" }).RequireAuthorization();
+api.MapGet("/connectors", (IOptions<LdapOptions> o, IBigFixConnector bigFix) => new { ldap = new { domain = o.Value.Domain, configured = o.Value.Enabled && !string.IsNullOrWhiteSpace(o.Value.Server), mode = "LDAPS", demo }, sccm = "not_configured", bigFix = bigFix.Configured ? "configured" : "not_configured" }).RequireAuthorization();
 api.MapGet("/audit", async (HttpContext c, WfiDb db, int page = 1) => { var domain=Domain(c); return await db.Audit.AsNoTracking().Where(x=>x.Domain==domain).OrderByDescending(x => x.Id).Skip((Math.Clamp(page, 1, 10000) - 1) * 50).Take(50).ToListAsync(); }).RequireAuthorization("Admin");
 
 // WFI 2.0 Ollama Config

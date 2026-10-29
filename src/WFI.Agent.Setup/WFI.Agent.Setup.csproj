@@ -2,7 +2,7 @@
   <PropertyGroup>
     <OutputType>WinExe</OutputType><TargetFramework>net10.0-windows</TargetFramework>
     <UseWindowsForms>true</UseWindowsForms><ApplicationManifest>app.manifest</ApplicationManifest>
-    <Company>Berkay Atağ</Company><ApplicationIcon>../../artifacts/branding/wfi.ico</ApplicationIcon><Version>0.6.0-preview.3</Version><AssemblyName>WFI-Agent-Setup</AssemblyName>
+    <Company>Berkay Atağ</Company><ApplicationIcon>../../artifacts/branding/wfi.ico</ApplicationIcon><Version>0.6.0-preview.4</Version><AssemblyName>WFI-Agent-Setup</AssemblyName>
   </PropertyGroup>
   <ItemGroup><ProjectReference Include="../WFI.Core/WFI.Core.csproj"/></ItemGroup>
 </Project>

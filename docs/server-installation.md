@@ -1,5 +1,28 @@
 # Sunucu kurulum rehberi
 
+## Güncel kurulum — 0.6.0-preview.4
+
+Yeni, tek sunuculu pilotta `WFI-Server-Setup.exe` dosyasını yönetici olarak açın. **İleri → ayarları kontrol et → yönetici parolasını iki kez yaz → Kur → Bitir.** Varsayılan dizinler `C:\Program Files\WFI Server` ve `C:\ProgramData\WFI Server`; veritabanı/veri dizinini farklı yerel diske değiştirebilirsiniz. Mevcut veya başka uygulamaya ait dizinleri kullanmayın. İlk giriş kullanıcı adı **local:admin**; parola kurulumda belirlediğiniz en az 14 karakterli paroladır. Hazır veya paylaşılan bir yönetici parolası yoktur.
+
+Kurucu IIS, Visual C++ runtime, .NET 10 Hosting Bundle, PostgreSQL 17 ve Ollama'yı hazırlar; `phi4-mini:latest` modelini indirir. DB sahibi ve uygulama için ayrı rastgele parolalar üretilir. Uygulama hesabına DDL/superuser yetkisi verilmez. Şema yalnız kurulumda uygulanır; uygulama açılışında migration yoktur. Yerel yönetici parolası PBKDF2-SHA256/600000 ile saklanır; parola komut satırına yazılmaz. PostgreSQL `127.0.0.1:55432`, Ollama `127.0.0.1:11435` dinler. Sunucudaki diğer PostgreSQL/Ollama kurulumları yeniden kullanılmaz.
+
+**İnternet gerekir:** birkaç GB bağımlılık ve model indirilir; en az 15 GB boş alan ve model için uygun RAM ayırın. Bu bir çevrimdışı tüm bileşenleri içeren paket değildir. Kurulum paketleri SHA256/SHA512 ile, Microsoft EXE'leri ayrıca Authenticode ile doğrulanır. İsteğe bağlı önbellek: EXE'nin yanında `WFI-Dependencies` klasörüne `scripts/server-dependencies.json` dosyasında adı geçen dört dosyayı koyun. Model indirmesi ayrıca internet ister. Bu dosyalara parola/kurum verisi eklemeyin.
+
+Windows yeniden başlatma isterse kurucu başarı göstermez. Windows'u yeniden başlatın ve aynı dizin/hostname/domain ile yeniden açın. Veritabanı/model aşamasındaki indirilebilir kesintiler aynı korunan kurulum günlüğünden devam eder. Yarım `initdb`, kısmi IIS kurulumu veya kayıtlı mevcut WFI üzerine körlemesine yeniden kurulum yapılmaz: `last-setup-status.txt` ve IIS durumunu inceleyin; verileri silmeyin. Kayıtlı kurulumun son HTTPS kontrolü başarısızsa önce DNS/sertifika/IIS'i düzeltin ve `/api/v1/ready` kontrol edin. Tam rollback veya otomatik yükseltme bu sihirbazın kapsamı değildir.
+
+Sertifika izi boş bırakılırsa belirtilen sunucu DNS adına bir yıllık yerel HTTPS sertifikası oluşturulur ve yalnız sunucunun güven deposuna eklenir. İstemciler için kurum CA sertifikası kullanın veya güveni GPO ile dağıtın; TLS doğrulamasını kapatmayın. Sunucu DNS adı gerçekten bu makineye çözülmelidir. Kurucu Domain profiline HTTPS/443 kuralı ekler; DB ve Ollama için ağdan inbound açmaz. Public profilli pilotta kurumsal firewall politikası ayrıca değerlendirilir.
+
+### LDAP'a sonradan geçiş
+
+Korunan `C:\Program Files\WFI Server\appsettings.local.json` içinde `Ldap.Enabled=true`, Domain, Server, Port=636, BaseDn ve GroupRoles alanlarını kurum AD bilgileriyle ayarlayın. `LocalAdmin.Enabled=true` iken önce ayrı tarayıcı oturumunda gerçek LDAP girişini doğrulayın. Ardından istenirse `LocalAdmin.Enabled=false` yapıp WFI uygulama havuzunu yeniden başlatın. Devre dışı bırakılan veya parolası değişen yerel hesabın eski oturumları kabul edilmez. Yerel hesap AD grup üyeliğine bağlı değildir ve Admin yetkilidir; parolasını güvenli saklayın.
+
+### Kaldırma ve kabul
+
+Programlar ve Özellikler: **WFI Server / Berkay Atağ / kırmızı WFI simgesi**. Kaldırma, sahipliği doğrulanan WFI IIS ve iki özel bağımlılık servisini kaldırır; veritabanı, modeller, kanıtlar, anahtarlar ve yapılandırma saklanır. Paylaşılan IIS/.NET/VC runtime ve sertifikalar otomatik silinmez. Yedekleme ve veri silme ayrı yönetici kararıdır.
+
+Gerçek Windows VM'de temiz kurulum, yeniden başlatma sonrası devam, ilk yerel giriş, DB/AI readiness, LDAP geçişi ve kaldırma henüz kabul kapısıdır. Bu bilgisayara test amacıyla gerçek servis kurulmaz. Aşağıdaki önceki sürüm/manual kurulum bölümleri yükseltme ve özel HA topolojileri içindir; yeni sihirbazın gereksinimleri yukarıdadır.
+
+
 ## 0.5.0 yükseltme
 
 Yedek ve bakım prosedürüyle VerifiedExperienceMemory migration'ını veya aynı paketteki schema.sql dosyasını DBA hesabıyla uygulayın. API ve worker'ı birlikte yükseltin. Yeni kolonlar LearningExcluded / LearningContextJson ve deneyim sorgusu için domain/status/completedAt indeksidir. Üretim başlangıcı şemayı otomatik değiştirmez. Readiness gerekli deneyim kolonlarını da sorgular; migration eksikse HTTP 503 döner ve LB düğümü trafiğe almamalıdır.

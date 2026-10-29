@@ -1,5 +1,16 @@
 # Firewall gereksinimleri
 
+## Otomatik tek sunucu kurulumu — 0.6.0-preview.4
+
+- İstemci/tarayıcı → WFI: HTTPS TCP/443. Kurucu yalnız Domain profiline `WFI-HTTPS` kuralını ekler.
+- WFI → kendi PostgreSQL'i: **127.0.0.1 TCP/55432**. Ağdan inbound açılmaz.
+- WFI → kendi Ollama'sı: **127.0.0.1 TCP/11435**. Ağdan inbound açılmaz. Manuel kurulumdaki 5432/11434 değerleriyle karıştırmayın.
+- Kurulum sırasında sunucu → `download.visualstudio.microsoft.com`, `builds.dotnet.microsoft.com`, `get.enterprisedb.com`, `github.com` ve GitHub release CDN yönlendirmeleri: HTTPS TCP/443. Model için Ollama registry/blob uç noktaları gerekir; kurum proxy ekibi güncel resmi Ollama dağıtım uç noktalarını izinli yapmalıdır. Windows özellik kaynağı yerel değilse Windows Update/kurum WSUS erişimi gerekir.
+- DNS kurum DNS sunucularına; LDAP etkinleştirilirse WFI → ilgili DC TCP/636. LDAP ilk yerel giriş için gerekmez.
+
+Önbelleğe alınmış dört doğrulanmış paket ikili indirmelerini azaltır; model için ayrıca erişim gerekir. TLS doğrulaması kapatılmaz. Yeni ajan inbound portu yoktur; otomatik DB/AI portları yalnız loopback'tir.
+
+
 ## 0.5.0 konsoldaki Ağ Erişimleri
 
 Aynı kaynak/hedef/port kuralları **Ajan ve Ağ Erişimleri → Ağ Erişimleri** sekmesinde okunabilir. Bu statik gereksinim görünümüdür; canlı erişim veya güvenlik duvarı değişikliği yapmaz. Tek EXE indirmesi yine istemci/tarayıcı → WFI TCP 443 kullanır. Sessiz kurulum yeni port açmaz. AI deneyim hafızası mevcut PostgreSQL ve kurum içi model bağlantısını kullanır; dış eğitim servisine veri gönderilmez.
