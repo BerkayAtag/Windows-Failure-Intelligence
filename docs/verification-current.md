@@ -300,3 +300,13 @@ GitHub Actions temiz Windows ortamında kurulum paketlerini üretti ve yayımlad
 
 Son GitHub doğrulaması başarılı: https://github.com/BerkayAtag/Windows-Failure-Intelligence/actions/runs/40496628234 . Temiz Windows ortamında Build, pnpm/NuGet kontrolleri, EF pending-model kontrolü ve tarayıcı testleri geçti. GitHub'dan indirilen iki EXE'nin gerçek dosya SHA256 değerleri de manifestle eşleşti; EXE'ler çalıştırılmadı.
 
+
+### Yayın ve son doğrulama — 29 Ekim 2026
+
+0.6.0-preview.3 yayımlandı: https://github.com/BerkayAtag/Windows-Failure-Intelligence/releases/tag/v0.6.0-preview.3
+Canlı tanıtım: https://berkayatag.github.io/Windows-Failure-Intelligence/
+GitHub temiz Windows doğrulaması başarılı: https://github.com/BerkayAtag/Windows-Failure-Intelligence/actions/runs/40805030864
+
+213/213 .NET, 13/13 Playwright ve PostgreSQL 17 üzerinde 2/2 test geçti. İlk PostgreSQL denemesinde 55439 portu Windows tarafından reddedildi; çıktısı dosyaya yönlendirilmiş ikinci koşu beklediği için yalnız o sentetik cluster durduruldu. 35440 portunda normal çıktı ile temiz tekrar 2/2 geçti ve cluster kapatıldı. Bu durum kapasite/HA kabulü değildir.
+
+NuGet ve pnpm taramaları bilinen zafiyet bildirmedi. İndirilen sunucu EXE'sinin SHA256 değeri GitHub digest ile eşleşti; CompanyName Berkay Atağ ve FileVersion 0.6.0.3 okundu. Canlı sitede 1440/390/768px, görseller, menü bağlantısı, güncel sürüm, © 2026 Berkay Atağ · WFI altbilgisi ve ayrı client download bağlantısının kaldırılması doğrulandı. Gerçek Windows VM appwiz/kurulum/kaldırma ve AD/HA kabulü halen açık; imzasız EXE'deki Publisher alanı sertifika değildir.
