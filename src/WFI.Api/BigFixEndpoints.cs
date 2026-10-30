@@ -51,7 +51,7 @@ public static class BigFixEndpoints
             }
             catch(Exception ex)when(ex is HttpRequestException or OperationCanceledException or InvalidDataException or System.Xml.XmlException or InputRejectedException)
             {return Results.Json(new{error="Merkez API sonucu alınamadı; bu durum istemci arızası kanıtı değildir."},statusCode:503);}
-        }).RequireAuthorization("Analyst").RequireRateLimiting("upload");
+        }).RequireAuthorization("Analyze").RequireRateLimiting("upload");
     }
 }
 

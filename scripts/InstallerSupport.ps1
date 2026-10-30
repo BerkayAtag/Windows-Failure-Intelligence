@@ -15,7 +15,7 @@ function Get-WfiUninstallProperties([string]$Product,[string]$InstallPath) {
     if($Product -notin @('Agent','Server')){throw 'Unknown WFI product.'}
     $full=Assert-WfiSafePath $InstallPath
     return @{
-        DisplayName="WFI $Product"; Publisher=("Berkay Ata"+[char]0x011F); DisplayVersion='0.7.0'
+        DisplayName="WFI $Product"; Publisher=("Berkay Ata"+[char]0x011F); DisplayVersion='0.7.1'
         # Programs and Features reads an unquoted icon path; quoting plus an index can hide the icon.
         DisplayIcon=(Join-Path $full 'wfi.ico'); InstallLocation=$full
         URLInfoAbout='https://berkayatag.github.io/Windows-Failure-Intelligence/'

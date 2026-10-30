@@ -1,3 +1,9 @@
+# 0.7.1 — 30 Ekim 2026
+
+- Ajan kurulum penceresi Windows temanızı izler; **Karanlık tema / Aydınlık tema** düğmesiyle değiştirilebilir.
+- **Kaldırdıktan sonra yeniden kurma / yükseltme:** Kaldırma, `C:\Program Files\WFI Agent\appsettings.local.json` ve `C:\ProgramData\WFI\agent-state.bin` kimliğini korur. WFI-Agent-Setup.exe bu kimliği bulursa **Mevcut kimlikle kur / yükselt** düğmesini gösterir; Admin parolası ve yeni kayıt gerekmez, cihaz konsolda aynı kimlikle görünür. Kimlik dosyası yoksa veya okunamıyorsa pencere yeniden kayıt adımlarına yönlendirir.
+- Makineyi başka bir kimlikle kaydetmek için konsolda **Cihazlar ve AI → Cihazı aç → Cihazı iptal et** seçin; ardından setup normal kayıt akışıyla aynı makine adını yeniden kaydeder.
+
 # 0.7.0 — 30 Ekim 2026 (güncel istemci kurulumu)
 
 - **Ek ön koşul yok.** Ajan kurucusu artık Windows 10/11 ve Windows Server ile gelen **Windows PowerShell 5.1** ile çalışır; PowerShell 7 gerekmez. Ajanın .NET 10 çalışma zamanı EXE'nin içindedir. Ajan servisi zaten Windows PowerShell 5.1 kullanıyordu; değişen yalnız kurulum adımıdır.

@@ -1,3 +1,13 @@
+# 0.7.1 — 30 Ekim 2026
+
+| Bulgu | Etki | Düzeltme | Regresyon |
+|---|---|---|---|
+| `POST /ai/analysis/{id}/feedback` ve `POST /devices/{id}/bigfix/probe` kayıtlı olmayan `Analyst` politikasını kullanıyordu | İstek her zaman 503; operatör geri bildirimi ve BigFix merkez yoklaması çalışmıyordu (yetki atlama yoktu, işlev kaybı vardı) | `Analyze` politikası (Analyst/Admin); Viewer 403 alır | `EndpointPolicyTests` (rota tablosundaki tüm politikalar kayıtlı mı; parametresiz tüm GET'ler 5xx vermiyor mu; geri bildirim rol matrisi) |
+| Model önerileri yalnız sonradan filtreleniyordu | Ham model çıktısı izinsiz kimlik içerebiliyordu | JSON şemasında istek bazlı `enum`; sunucu filtresi korunur | `OllamaEngineTests` |
+| Kaldırılan ajanın yeniden kurulumu engelliydi | Operatörlerin kimlik dosyalarını elle silmesi gerekebilirdi | Korunan kimlik (yapılandırma + DPAPI durumu) aynı cihaz kimliğiyle yeniden kullanılır; parola istenmez | Kurulum önkontrol testleri |
+
+Ajan TLS doğrulaması değişmedi: geliştirme sertifikası güvenilir değilken ajan bağlanmaz. Bu sürümde de gerçek AD/HA ve Windows Server VM kabulü ölçülmedi.
+
 # 0.7.0 — 30 Ekim 2026 güvenlik ve hata incelemesi
 
 Kaynak incelemesiyle bulunan ve davranış regresyonlarıyla doğrulanan düzeltmeler:

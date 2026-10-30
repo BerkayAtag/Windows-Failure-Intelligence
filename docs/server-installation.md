@@ -1,3 +1,9 @@
+# 0.7.1 — 30 Ekim 2026
+
+- Sihirbaz Windows temanıza göre aydınlık veya karanlık açılır; sağ üstteki düğmeyle değiştirilebilir. Tema yalnız görünümü etkiler.
+- Kurucu yapılandırmaya `Ollama:TimeoutSeconds=240` yazar. GPU'suz sunucuda phi4-mini analizi 1–4 dakika sürebilir; değer 10–240 sn arasında sınırlanır. Elle kurulumda aynı değeri `appsettings.local.json` içinde verin.
+- Yapay zekâ yanıtları Türkçe ve JSON şemasıyla alınır; öneriler kanıtla eşleşen katalog kimlikleriyle sınırlıdır. Yeni bir kurulum veya port gerekmez.
+
 # 0.7.0 — 30 Ekim 2026 (güncel kurulum)
 
 **WFI-Server-Setup.exe → Yönetici olarak çalıştır → İleri → ayarlar → Kur → Bitir.** Sihirbaz Türkçe karakterlerle açılır, ilerleme çubuğu gösterir ve bitişte **Konsolu aç** bağlantısı verir. İndirme: https://github.com/BerkayAtag/Windows-Failure-Intelligence/releases/latest
@@ -146,7 +152,7 @@ API VE ayrı worker'ın appsettings.local.json dosyasına:
 "Ollama": {
   "BaseUrl": "http://127.0.0.1:11434",
   "DefaultModel": "phi4-mini:latest",
-  "TimeoutSeconds": 120
+  "TimeoutSeconds": 240
 }
 ```
 

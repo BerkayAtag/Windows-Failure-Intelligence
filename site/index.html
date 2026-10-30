@@ -10,7 +10,7 @@
 <meta property="og:image" content="https://berkayatag.github.io/Windows-Failure-Intelligence/assets/console.png">
 <title>WFI — Windows Failure Intelligence</title>
 <link rel="icon" type="image/svg+xml" href="assets/wfi.svg">
-<link rel="stylesheet" href="style.css?v=0.7.0">
+<link rel="stylesheet" href="style.css?v=0.7.1">
 <script>
   // Varsayılan aydınlık tema; ziyaretçinin seçimi bu tarayıcıda hatırlanır.
   // Sayfa boyanmadan önce uygulanır, böylece tema geçişinde yanıp sönme olmaz.
@@ -41,7 +41,7 @@
 <main id="main">
   <section class="hero">
     <div class="hero-copy">
-      <p class="eyebrow" lang="en">Sürüm 0.7.0 · Windows Server x64</p>
+      <p class="eyebrow" lang="en">Sürüm 0.7.1 · Windows Server x64</p>
       <h1>Windows sorunlarını<br><em>kanıtla çözün.</em></h1>
       <p class="lead">Makineyi seçin, sorunu anlatın. WFI ajanı kanıtları toplar, sunucudaki yerel yapay zekâ bulguları değerlendirir; onarım onaylı işlem kataloğu ve cihaz politikalarıyla yürür.</p>
       <div class="actions">
@@ -52,7 +52,7 @@
         <li>İleri → Kur → Bitir</li>
         <li>Ollama isteğe bağlı</li>
         <li>Kurum içi AI</li>
-        <li>Açık · aydınlık ve karanlık tema</li>
+        <li>Aydınlık ve karanlık tema</li>
       </ul>
     </div>
     <figure class="hero-shot">
@@ -95,8 +95,8 @@
         <figcaption>Ajan ve Ağ Erişimleri · tek EXE istemci kurulumu</figcaption>
       </figure>
       <figure>
-        <img src="assets/setup-wizard.png" alt="WFI sunucu kurulum sihirbazı: dizinler, DNS adı, domain, yönetici parolası ve Ollama seçeneği" width="736" height="679" loading="lazy">
-        <figcaption>Sunucu kurulumu · ayarlar ve Ollama seçimi</figcaption>
+        <img src="assets/setup-wizard.png" data-light-src="assets/setup-wizard.png" data-dark-src="assets/setup-wizard-dark.png" alt="WFI sunucu kurulum sihirbazı: dizinler, DNS adı, domain, yönetici parolası ve Ollama seçeneği" width="736" height="679" loading="lazy">
+        <figcaption data-light-text="Sunucu kurulumu · aydınlık tema · ayarlar ve Ollama seçimi" data-dark-text="Sunucu kurulumu · karanlık tema · ayarlar ve Ollama seçimi">Sunucu kurulumu · aydınlık tema · ayarlar ve Ollama seçimi</figcaption>
       </figure>
       <figure>
         <img src="assets/login.png" data-light-src="assets/login.png" data-dark-src="assets/login-dark.png" alt="WFI giriş ekranı" width="1440" height="1000" loading="lazy">
@@ -128,12 +128,12 @@
     <div class="install">
       <ol class="steps">
         <li><b>İndirin</b><span>WFI-Server-Setup.exe dosyasını Windows Server'a indirip yönetici olarak çalıştırın.</span></li>
-        <li><b>İleri</b><span>Dizinleri, DNS adını ve yönetici parolasını kontrol edin. Ollama makinede yoksa WFI kurar; varsa mevcut olanı kullanabilir veya AI'yı sonraya bırakabilirsiniz.</span></li>
+        <li><b>İleri</b><span>Sihirbaz Windows temanıza göre aydınlık veya karanlık açılır; sağ üstteki düğmeyle değiştirebilirsiniz. Dizinleri, DNS adını ve yönetici parolasını kontrol edin. Ollama makinede yoksa WFI kurar; varsa mevcut olanı kullanabilir veya AI'yı sonraya bırakabilirsiniz.</span></li>
         <li><b>Kur</b><span>IIS, .NET 10 Hosting Bundle, PostgreSQL, HTTPS sertifikası, güvenlik duvarı kuralı ve şema otomatik hazırlanır.</span></li>
         <li><b>Bitir</b><span>Konsolu açın, local:admin ve kurulum parolanızla giriş yapın. İstemci ajanını Ajan ve Ağ Erişimleri ekranından indirin.</span></li>
       </ol>
       <figure class="install-shot">
-        <img src="assets/setup-finish.png" alt="WFI sunucu kurulumu tamamlandı ekranı ve Konsolu aç bağlantısı" width="736" height="679" loading="lazy">
+        <img src="assets/setup-finish.png" data-light-src="assets/setup-finish.png" data-dark-src="assets/setup-finish-dark.png" alt="WFI sunucu kurulumu tamamlandı ekranı ve Konsolu aç bağlantısı" width="736" height="679" loading="lazy">
       </figure>
     </div>
     <div class="downloads">

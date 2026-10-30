@@ -13,8 +13,9 @@ $icon=Join-Path (Split-Path $PSScriptRoot -Parent) 'api\wfi.ico'
 if(Test-Path -LiteralPath $icon){try{$form.Icon=New-Object Drawing.Icon($icon)}catch{# The wizard still works with the default icon.
 }}
 $header=New-Object Windows.Forms.Panel;$header.SetBounds(0,0,720,84);$header.BackColor=$red;$form.Controls.Add($header)
-$title=New-Object Windows.Forms.Label;$title.Text='WFI · Sunucu kurulumu';$title.SetBounds(28,14,660,36);$title.Font=New-Object Drawing.Font('Segoe UI',18,[Drawing.FontStyle]::Bold);$title.ForeColor=[Drawing.Color]::White;$header.Controls.Add($title)
-$step=New-Object Windows.Forms.Label;$step.SetBounds(30,52,660,22);$step.ForeColor=[Drawing.Color]::White;$step.Text='Adım 1 / 3 · Hoş geldiniz';$header.Controls.Add($step)
+$title=New-Object Windows.Forms.Label;$title.Text='WFI · Sunucu kurulumu';$title.SetBounds(28,14,540,36);$title.Font=New-Object Drawing.Font('Segoe UI',18,[Drawing.FontStyle]::Bold);$title.ForeColor=[Drawing.Color]::White;$header.Controls.Add($title)
+$step=New-Object Windows.Forms.Label;$step.SetBounds(30,52,540,22);$step.ForeColor=[Drawing.Color]::White;$step.Text='Adım 1 / 3 · Hoş geldiniz';$header.Controls.Add($step)
+$themeButton=New-Object Windows.Forms.Button;$themeButton.SetBounds(574,24,122,34);$themeButton.FlatStyle='Flat';$themeButton.ForeColor=[Drawing.Color]::White;$themeButton.FlatAppearance.BorderColor=[Drawing.Color]::White;$themeButton.Font=New-Object Drawing.Font('Segoe UI',9);$header.Controls.Add($themeButton)
 
 # Page 1: welcome.
 $intro=New-Object Windows.Forms.Label;$intro.SetBounds(30,104,660,250)
@@ -58,6 +59,41 @@ $next=New-Object Windows.Forms.Button;$next.Text='İleri >';$next.SetBounds(560,
 $cancel=New-Object Windows.Forms.Button;$cancel.Text='İptal';$cancel.SetBounds(440,580,110,36);$form.Controls.Add($cancel)
 $cancel.Add_Click({$form.Close()})
 
+# Theme: follows the Windows app theme on start; the header button switches light/dark for this window.
+Add-Type -Namespace WfiSetup -Name Dwm -MemberDefinition '[DllImport("dwmapi.dll")] public static extern int DwmSetWindowAttribute(IntPtr hwnd,int attribute,ref int value,int size);'
+function Test-WfiSystemDarkTheme {
+    try{return (Get-ItemProperty -LiteralPath 'HKCU:\Software\Microsoft\Windows\CurrentVersion\Themes\Personalize' -Name AppsUseLightTheme -ErrorAction Stop).AppsUseLightTheme -eq 0}catch{return $false}
+}
+$script:dark=$false;$script:failed=$false
+function Set-WfiTheme([bool]$Dark) {
+    $script:dark=$Dark
+    $rgb={param($r,$g,$b)[Drawing.Color]::FromArgb($r,$g,$b)}
+    $bg=if($Dark){& $rgb 23 25 31}else{[Drawing.Color]::White}
+    $fg=if($Dark){& $rgb 232 235 241}else{& $rgb 30 32 38}
+    $muted=if($Dark){& $rgb 160 168 181}else{[Drawing.Color]::DimGray}
+    $field=if($Dark){& $rgb 35 39 48}else{[Drawing.Color]::White}
+    $edge=if($Dark){& $rgb 60 66 78}else{[Drawing.Color]::Gainsboro}
+    $form.BackColor=$bg;$header.BackColor=if($Dark){& $rgb 163 0 18}else{$red};$themeButton.BackColor=$header.BackColor
+    $themeButton.Text=if($Dark){'☀  Aydınlık tema'}else{'☾  Karanlık tema'}
+    $walk={param($parent)foreach($c in $parent.Controls){
+        if($c -eq $header){continue}
+        if($c -is [Windows.Forms.TextBox]){$c.BackColor=$field;$c.ForeColor=$fg;$c.BorderStyle='FixedSingle'}
+        elseif($c -is [Windows.Forms.LinkLabel]){$c.LinkColor=if($Dark){& $rgb 255 107 118}else{$red};$c.ActiveLinkColor=$c.LinkColor}
+        elseif($c -is [Windows.Forms.Label] -or $c -is [Windows.Forms.RadioButton] -or $c -is [Windows.Forms.GroupBox]){$c.ForeColor=$fg;$c.BackColor=$bg}
+        elseif($c -is [Windows.Forms.Panel]){$c.BackColor=$bg}
+        if($c.Controls.Count){& $walk $c}}}
+    & $walk $form
+    $hint.ForeColor=$muted;$footer.ForeColor=$muted;$line.BackColor=$edge
+    if($script:failed){$status.ForeColor=if($Dark){& $rgb 255 140 140}else{[Drawing.Color]::DarkRed}}
+    $cancel.FlatStyle='Flat';$cancel.BackColor=if($Dark){& $rgb 40 44 53}else{& $rgb 245 245 247};$cancel.ForeColor=$fg;$cancel.FlatAppearance.BorderColor=$edge
+    $next.FlatAppearance.BorderColor=$red
+    # Windows 10 1809+ / 11 dark title bar; older builds ignore the attribute.
+    if($form.IsHandleCreated){$value=[int]$Dark;foreach($attribute in @(20,19)){if([WfiSetup.Dwm]::DwmSetWindowAttribute($form.Handle,$attribute,[ref]$value,4) -eq 0){break}}}
+}
+$themeButton.Add_Click({Set-WfiTheme (-not $script:dark)})
+$form.Add_HandleCreated({Set-WfiTheme $script:dark})
+Set-WfiTheme (Test-WfiSystemDarkTheme)
+
 $script:phase=0;$script:process=$null;$script:result=2
 $timer=New-Object Windows.Forms.Timer;$timer.Interval=1000
 $stateFile=Join-Path (Split-Path $PSScriptRoot -Parent) 'setup-status.txt'
@@ -74,7 +110,7 @@ $timer.Add_Tick({
             $progress.Value=7;$step.Text='Adım 3 / 3 · Kurulum tamamlandı'
             $url='https://'+$hostname.Text.Trim()+'/';$open.Tag=$url;$open.Text='Konsolu aç: '+$url;$open.Visible=$true
         } else {
-            $step.Text='Adım 3 / 3 · Kurulum tamamlanamadı';$status.ForeColor=[Drawing.Color]::DarkRed
+            $step.Text='Adım 3 / 3 · Kurulum tamamlanamadı';$script:failed=$true;Set-WfiTheme $script:dark
             $status.Text+="`n`nAyarlar korunur. Sorunu giderdikten sonra kurulumu aynı ayarlarla yeniden çalıştırın; tamamlanan adımlar tekrarlanmaz."
         }
     }

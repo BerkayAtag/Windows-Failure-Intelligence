@@ -10,7 +10,7 @@ concurrency:
   group: release
   cancel-in-progress: false
 env:
-  WFI_VERSION: '0.7.0'
+  WFI_VERSION: '0.7.1'
 jobs:
   installers:
     runs-on: windows-latest

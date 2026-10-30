@@ -55,7 +55,7 @@ try {
     & $compiler '/nologo' '/codepage:65001' '/target:winexe' '/platform:x64' '/optimize+' '/reference:System.IO.Compression.dll' '/reference:System.IO.Compression.FileSystem.dll' '/reference:System.Windows.Forms.dll' "/win32manifest:$manifest" "/win32icon:$projectRoot/artifacts/branding/wfi.ico" "/resource:$payload,WfiPayload" "/out:$setupOutput" $bootstrap
     if($LASTEXITCODE -ne 0){throw 'Single-file agent setup build failed.'}
     $setupFile=Get-Item artifacts/api/distribution/WFI-Agent-Setup.exe
-    @{version='0.7.0';size=$setupFile.Length;sha256=(Get-FileHash -LiteralPath $setupFile.FullName -Algorithm SHA256).Hash;platform='Windows x64';signed=$false} | ConvertTo-Json | Set-Content -LiteralPath artifacts/api/distribution/agent-manifest.json -Encoding utf8
+    @{version='0.7.1';size=$setupFile.Length;sha256=(Get-FileHash -LiteralPath $setupFile.FullName -Algorithm SHA256).Hash;platform='Windows x64';signed=$false} | ConvertTo-Json | Set-Content -LiteralPath artifacts/api/distribution/agent-manifest.json -Encoding utf8
     Copy-Item -LiteralPath artifacts/api/distribution/WFI-Agent-Setup.exe,artifacts/api/distribution/agent-manifest.json -Destination src/WFI.Api/distribution -Force
     # The ZIP is only the EXE's embedded payload; the console serves the EXE, so the server package does not carry it twice.
     foreach($intermediate in @('artifacts/api/distribution/WFI-Agent.zip','src/WFI.Api/distribution/WFI-Agent.zip')){if(Test-Path -LiteralPath $intermediate){Remove-Item -LiteralPath $intermediate -Force}}

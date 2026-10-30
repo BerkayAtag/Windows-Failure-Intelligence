@@ -1,4 +1,4 @@
-## WFI 0.7.0 — Windows Failure Intelligence
+## WFI 0.7.1 — Windows Failure Intelligence
 
 Windows uç noktalarında kanıta dayalı teşhis, kurum içi yapay zekâ (Ollama) ve onaylı katalogla kontrollü onarım.
 
@@ -9,7 +9,14 @@ Windows uç noktalarında kanıta dayalı teşhis, kurum içi yapay zekâ (Ollam
 - **SHA256SUMS.txt**: dosya bütünlüğü (yayıncı doğrulaması değildir).
 - İstemci ajanı ayrı release dosyası değildir: kurulumdan sonra konsolda **Ajan ve Ağ Erişimleri → Windows ajanını indir**.
 
-### Bu sürümde
+### 0.7.1 yenilikleri
+- Kurulum sihirbazı ve ajan kurulumu **Windows temasını izler**; sağ üstteki düğmeyle aydınlık/karanlık geçiş yapılır, karanlık temada başlık çubuğu da koyulaşır.
+- Tanıtım sayfasındaki kurulum görselleri de seçilen temaya göre değişir.
+- **Yerel LLM iyileştirmeleri:** Ollama JSON şeması ile Türkçe, en fazla 3 hipotezli, kural kimliği ve kanıt atıflı yanıt; öneriler istek bazında yalnız izinli katalog kimlikleriyle sınırlı; güven değeri kopyalanmaz. Model zaman aşımı 240 sn (GPU'suz sunucular için).
+- **Hata düzeltmeleri:** AI geri bildirimi ve BigFix merkez yoklaması her istekte 503 veriyordu (kayıtlı olmayan yetki politikası). Kaldırılan ajan EXE ile yeniden kurulamıyordu; artık korunan kimlikle parola istemeden kurulur. Konsola "Cihazı iptal et" düğmesi eklendi.
+- Gerçek phi4-mini ile uçtan uca doğrulama ve AI Kalite Laboratuvarı tam koşusu: [doğrulama](https://github.com/BerkayAtag/Windows-Failure-Intelligence/blob/main/docs/verification-current.md).
+
+### 0.7.0 ile gelenler
 - Kurulum sihirbazı yenilendi: Türkçe karakterler, adım göstergesi, ilerleme çubuğu, **Konsolu aç** bağlantısı.
 - **Ollama seçeneği:** makinede yoksa WFI kurar (varsayılan); 127.0.0.1:11434'te çalışan bir Ollama varsa onu kullanabilir; ya da AI'yı sonraya bırakabilirsiniz.
 - IIS, .NET 10 Hosting Bundle, VC++ çalışma zamanı, PostgreSQL, HTTPS sertifikası, güvenlik duvarı kuralı ve şema otomatik hazırlanır. Yeniden denemede ikinci sertifika oluşturulmaz.

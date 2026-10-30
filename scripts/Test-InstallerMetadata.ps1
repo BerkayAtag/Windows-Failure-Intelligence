@@ -8,7 +8,7 @@ try {
         if($properties.Publisher -ne ('Berkay Ata'+[char]0x011F) -or $properties.DisplayName -ne "WFI $product"){throw 'Publisher/product mismatch'}
         if($properties.UninstallString -ne ('"'+(Join-Path $root 'WFI-Uninstall.exe')+'"')){throw 'Uninstaller must be quoted.'}
         if($properties.DisplayIcon -ne (Join-Path $root 'wfi.ico')){throw 'Icon must be the unquoted installed icon path.'}
-        if($properties.DisplayVersion -ne '0.7.0' -or $properties.URLInfoAbout -notlike 'https://*'){throw 'Version/support metadata mismatch.'}
+        if($properties.DisplayVersion -ne '0.7.1' -or $properties.URLInfoAbout -notlike 'https://*'){throw 'Version/support metadata mismatch.'}
     }
     & {
         $writes=@{}

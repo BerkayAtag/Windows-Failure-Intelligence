@@ -312,10 +312,10 @@ api.MapGet("/ai/analysis/{id:guid}", async (Guid id, WfiDb db, HttpContext c) =>
     return Results.Ok(new { aiJob.Id, aiJob.ModelUsed, aiJob.VersionsJson, aiJob.LearningContextJson, aiJob.Hostname, aiJob.Domain, aiJob.Status, aiJob.Conclusion, aiJob.HypothesesJson, aiJob.ConfidenceScore, aiJob.MissingEvidenceJson, aiJob.RecommendedPlaybooksJson });
 }).RequireAuthorization();
 
-api.MapGet("/ai/models", async (IOllamaService ollama) =>
+api.MapGet("/ai/models", async (IOllamaService ollama, IConfiguration configuration) =>
 {
     var models = await ollama.GetModelsAsync();
-    return Results.Ok(new { availableModels = models.Select(m => m.Name), defaultModel = "phi4-mini" });
+    return Results.Ok(new { availableModels = models.Select(m => m.Name), defaultModel = configuration["Ollama:DefaultModel"] ?? "phi4-mini:latest" });
 }).RequireAuthorization();
 
 api.MapPost("/ai/model", async (WfiDb db, SetModelRequest req, IOllamaService ollama, HttpContext c) =>

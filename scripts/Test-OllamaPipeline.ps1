@@ -2,8 +2,7 @@
 $ErrorActionPreference='Stop'
 $uri=[uri]$BaseUrl
 if (-not $uri.IsLoopback) { throw 'This synthetic smoke test is restricted to loopback development servers.' }
-$session=[Microsoft.PowerShell.Commands.WebRequestSession]::new()
-$csrf=(Invoke-RestMethod "$BaseUrl/api/v1/auth/csrf" -WebSession $session).token
+$csrf=(Invoke-RestMethod "$BaseUrl/api/v1/auth/csrf" -SessionVariable session -UseBasicParsing).token
 $headers=@{'X-CSRF-TOKEN'=$csrf}
 Invoke-RestMethod "$BaseUrl/api/v1/auth/demo" -Method Post -WebSession $session -Headers $headers | Out-Null
 $headers['X-CSRF-TOKEN']=(Invoke-RestMethod "$BaseUrl/api/v1/auth/csrf" -WebSession $session).token
@@ -11,7 +10,9 @@ function Send-User([string]$Path,$Body) {
     Invoke-RestMethod "$BaseUrl/api/v1/$Path" -Method Post -WebSession $session -Headers $headers -ContentType 'application/json' -Body ($Body | ConvertTo-Json -Depth 8)
 }
 $registration=Send-User 'devices/register' @{hostname=('synthetic-'+[guid]::NewGuid().ToString('N').Substring(0,12))}
-$credential=[Convert]::ToHexString([Security.Cryptography.RandomNumberGenerator]::GetBytes(32))
+# Windows PowerShell 5.1 compatible: no Convert.ToHexString / static GetBytes.
+$bytes=New-Object byte[] 32;$rng=[Security.Cryptography.RandomNumberGenerator]::Create();try{$rng.GetBytes($bytes)}finally{$rng.Dispose()}
+$credential=[BitConverter]::ToString($bytes).Replace('-','')
 $agentHeaders=@{'X-WFI-Device'=$registration.id;Authorization="Bearer $credential"}
 try {
     Invoke-RestMethod "$BaseUrl/api/v1/agent/enroll" -Method Post -ContentType 'application/json' -Body (@{deviceId=$registration.id;token=$registration.enrollmentToken;credential=$credential}|ConvertTo-Json) | Out-Null

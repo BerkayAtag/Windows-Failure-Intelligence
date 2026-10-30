@@ -20,7 +20,7 @@ public static class AiQualityEndpoints
             row.Outcome=input.Outcome;row.UpdatedAt=DateTime.UtcNow;
             db.Audit.Add(new() { Domain=c.User.FindFirstValue("domain")!,Actor=actor,Action="ai.feedback",Target=id+":"+input.Outcome});
             await db.SaveChangesAsync(ct);await tx.CommitAsync(ct);return Results.Ok(row);
-        }).RequireAuthorization("Analyst");
+        }).RequireAuthorization("Analyze");
         var group=api.MapGroup("/ai/quality").RequireAuthorization("Admin");
         group.MapGet("",async(HttpContext c,WfiDb db)=>
         {

@@ -57,7 +57,7 @@ public sealed class OllamaService(IHttpClientFactory clients,IConfiguration conf
         try
         {
             using var client=clients.CreateClient("ollama");using var timeout=CancellationTokenSource.CreateLinkedTokenSource(ct);
-            timeout.CancelAfter(TimeSpan.FromSeconds(Math.Clamp(configuration.GetValue("Ollama:TimeoutSeconds",120),10,240)));
+            timeout.CancelAfter(TimeSpan.FromSeconds(Math.Clamp(configuration.GetValue("Ollama:TimeoutSeconds",240),10,240)));
             using var scope=scopes.CreateScope();
             var db=scope.ServiceProvider.GetRequiredService<WfiDb>();
             var lease=await ModelCapacity.TryAcquireAsync(db,configuration.GetValue("Ollama:MaxConcurrent",1),ct);

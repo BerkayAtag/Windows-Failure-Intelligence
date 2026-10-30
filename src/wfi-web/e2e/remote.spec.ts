@@ -62,3 +62,22 @@ test('device enrollment, per-device policy, diagnosis queue and manual remediati
   await page.screenshot({ path: path.join(os.tmpdir(), 'wfi-remote-mobile.png'), fullPage: true });
   expect(errors).toEqual([]);
 });
+
+test('administrator can revoke a device and the same hostname can be registered again', async ({ page }) => {
+  await page.goto('/'); await page.getByRole('button', { name: 'Demoyu aç' }).click();
+  await page.getByRole('button', { name: 'Cihazlar ve AI', exact: true }).click();
+  const hostname = `revoke-${Date.now()}`;
+  await page.getByLabel('Yeni cihaz hostname').fill(hostname);
+  await page.getByRole('button', { name: 'Cihaz kaydet', exact: true }).click();
+  await page.getByRole('button', { name: 'Bilgileri kapat' }).click();
+  await page.getByLabel('Ajan cihazı ara').fill(hostname);
+  await page.getByRole('row').filter({ hasText: hostname }).getByRole('button', { name: 'Cihazı aç', exact: true }).click();
+  page.once('dialog', dialog => dialog.accept());
+  await page.getByRole('button', { name: 'Cihazı iptal et', exact: true }).click();
+  await expect(page.getByRole('status')).toContainText('Cihaz iptal edildi');
+  await expect(page.getByRole('button', { name: 'Cihazı iptal et', exact: true })).toHaveCount(0);
+  // Re-registration of a revoked machine reuses the identity instead of failing with 409.
+  await page.getByLabel('Yeni cihaz hostname').fill(hostname);
+  await page.getByRole('button', { name: 'Cihaz kaydet', exact: true }).click();
+  await expect(page.getByLabel('Cihaz kimliği', { exact: true })).not.toBeEmpty();
+});

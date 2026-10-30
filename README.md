@@ -5,7 +5,7 @@
 <p align="center"><b>Windows sorunlarını kanıtla çözün.</b> Yerel yapay zekâ · Kontrollü onarım · Tek konsol</p>
 
 <p align="center">
-  <a href="https://github.com/BerkayAtag/Windows-Failure-Intelligence/releases/latest/download/WFI-Server-Setup.exe"><b>Sunucu kurulumunu indir (0.7.0)</b></a> ·
+  <a href="https://github.com/BerkayAtag/Windows-Failure-Intelligence/releases/latest/download/WFI-Server-Setup.exe"><b>Sunucu kurulumunu indir (0.7.1)</b></a> ·
   <a href="https://berkayatag.github.io/Windows-Failure-Intelligence/">Tanıtım sayfası</a> ·
   <a href="docs/server-installation.md">Sunucu kurulumu</a> ·
   <a href="docs/client-installation.md">İstemci kurulumu</a> ·
@@ -23,7 +23,7 @@ Makineyi seçin, sorunu anlatın. WFI ajanı kanıtları toplar, sunucudaki yere
 ## Kurulum: İleri → Kur → Bitir
 
 1. [WFI-Server-Setup.exe](https://github.com/BerkayAtag/Windows-Failure-Intelligence/releases/latest/download/WFI-Server-Setup.exe) dosyasını Windows Server'a indirip **yönetici olarak çalıştırın**.
-2. **İleri**: dizinleri, sunucu DNS adını, istemci domain'ini ve `local:admin` parolasını (en az 14 karakter) girin. **Yerel yapay zekâ** için seçim yapın:
+2. **İleri**: sihirbaz Windows temanıza göre aydınlık veya karanlık açılır, sağ üstteki düğmeyle değiştirilebilir. Dizinleri, sunucu DNS adını, istemci domain'ini ve `local:admin` parolasını (en az 14 karakter) girin. **Yerel yapay zekâ** için seçim yapın:
    - Makinede Ollama yoksa **Ollama ve phi4-mini modelini WFI için kur** (varsayılan),
    - 127.0.0.1:11434'te çalışan bir Ollama varsa **mevcut Ollama'yı kullan**,
    - ya da **şimdi kurma**.
@@ -32,9 +32,9 @@ Makineyi seçin, sorunu anlatın. WFI ajanı kanıtları toplar, sunucudaki yere
 
 | Ayarlar ve Ollama seçimi | Kurulum tamamlandı |
 |---|---|
-| <img src="site/assets/setup-wizard.png" alt="Kurulum sihirbazı ayarlar adımı" width="420"> | <img src="site/assets/setup-finish.png" alt="Kurulum tamamlandı ekranı" width="420"> |
+| <picture><source media="(prefers-color-scheme: dark)" srcset="site/assets/setup-wizard-dark.png"><img src="site/assets/setup-wizard.png" alt="Kurulum sihirbazı ayarlar adımı" width="420"></picture> | <picture><source media="(prefers-color-scheme: dark)" srcset="site/assets/setup-finish-dark.png"><img src="site/assets/setup-finish.png" alt="Kurulum tamamlandı ekranı" width="420"></picture> |
 
-Programlar ve Özellikler'de **WFI Server**, yayıncı **Berkay Atağ**, sürüm **0.7.0** ve kırmızı WFI simgesi görünür. İlk kurulum internetten birkaç GB indirir. Yarıda kalırsa (ör. yeniden başlatma gerekirse) kurucuyu aynı ayarlarla tekrar çalıştırın; tamamlanan adımlar tekrarlanmaz. Ayrıntı: [sunucu kurulumu](docs/server-installation.md).
+Kurulum sihirbazı ve ajan kurulumu Windows temanızı izler (aydınlık/karanlık, düğmeyle değiştirilebilir). Programlar ve Özellikler'de **WFI Server**, yayıncı **Berkay Atağ**, sürüm **0.7.1** ve kırmızı WFI simgesi görünür. İlk kurulum internetten birkaç GB indirir. Yarıda kalırsa (ör. yeniden başlatma gerekirse) kurucuyu aynı ayarlarla tekrar çalıştırın; tamamlanan adımlar tekrarlanmaz. Ayrıntı: [sunucu kurulumu](docs/server-installation.md).
 
 **İstemci ajanı** GitHub'da ayrı dosya olarak yayımlanmaz: konsolda **Ajan ve Ağ Erişimleri → Windows ajanını indir** ile tek EXE alınır. Ek ön koşul yoktur (Windows PowerShell 5.1 yeterli); makine Admin hesabıyla otomatik kaydolur. Ayrıntı: [istemci kurulumu](docs/client-installation.md).
 
@@ -51,7 +51,7 @@ Ekranlar sentetik demo verisiyle gerçek uygulamadan alınmıştır. Konsolda St
 ## Özellikler
 
 - **Makineden teşhis:** Windows olayları, servisler, BigFix ve SCCM bulguları ajan tarafından toplanır; log yükleme isteğe bağlıdır.
-- **Kurum içi AI:** Ollama sunucuda çalışır (varsayılan phi4-mini). Doğrulanmış geçmiş deneyimler bağlam sağlar; model ağırlıkları yeniden eğitilmez.
+- **Kurum içi AI:** Ollama sunucuda çalışır (varsayılan phi4-mini). Yanıt JSON şemasıyla Türkçe alınır: özet, en fazla 3 hipotez, kanıt atfı, doğrulama adımları, eksik kanıt ve yalnız izinli katalog önerileri. Doğrulanmış geçmiş deneyimler bağlam sağlar; model ağırlıkları yeniden eğitilmez. Operatör "Çözüldü / Çözülmedi" geri bildirimi verir; AI Kalite Laboratuvarı modeli 40 sentetik vakada ölçer.
 - **Kontrollü onarım:** serbest AI komutu çalıştırılmaz. Sabit katalog, önkontrol/işlem/doğrulama, yüksek risk için Admin onayı; **Onarım Otomasyonu** pilot grubu, bakım aralığı ve belirsiz sonuçta duraklatma.
 - **Erişim:** `local:admin` veya LDAPS ile Viewer/Analyst/Admin grup eşlemesi; tüm veriler oturumun domain'iyle sınırlı, işlemler denetim kaydında.
 - **İşletim:** Sistem Sağlığı, model kapasite slotu, BigFix merkez doğrulaması, AI Kalite Laboratuvarı.
@@ -81,7 +81,7 @@ Demo yalnız sentetik veri içindir. Üretimde şema kurulum sırasında uygulan
 
 ## Doğrulama ve sınırlar
 
-0.7.0 sonuçları ve açık kabul maddeleri: [doğrulama](docs/verification-current.md), [kabul matrisi](docs/acceptance-matrix.md). EXE'ler Authenticode imzalı değildir; yayıncı adı Programlar ve Özellikler kaydıdır. Gerçek Windows Server VM kurulum/kaldırma, gerçek AD/BigFix, HA ve 40.000 cihaz kapasitesi bu sürümde ölçülmedi; sıfır hata veya güvenlik açığı iddiası yoktur. Önceki sürüm notları: [arşiv](docs/release-notes-archive.md).
+0.7.1 sonuçları ve açık kabul maddeleri: [doğrulama](docs/verification-current.md), [kabul matrisi](docs/acceptance-matrix.md). EXE'ler Authenticode imzalı değildir; yayıncı adı Programlar ve Özellikler kaydıdır. Gerçek Windows Server VM kurulum/kaldırma, gerçek AD/BigFix, HA ve 40.000 cihaz kapasitesi bu sürümde ölçülmedi; sıfır hata veya güvenlik açığı iddiası yoktur. Önceki sürüm notları: [arşiv](docs/release-notes-archive.md).
 
 ---
 

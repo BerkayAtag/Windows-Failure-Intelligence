@@ -7,7 +7,26 @@ namespace WFI.Core;
 
 public sealed class OllamaEngine(HttpClient httpClient)
 {
-    public const string PromptVersion="2.0.0";
+    public const string PromptVersion="2.2.0";
+    // Ollama structured output: small local models follow a JSON schema far more reliably than a JSON example in prose.
+    // Recommendations are constrained to this request's evidence-backed catalog codes (none → empty list only).
+    internal static object ResponseSchema(IReadOnlyCollection<string> allowedCodes)=>new
+    {
+        type="object",
+        properties=new Dictionary<string,object>
+        {
+            ["conclusion"]=new{type="string"},
+            ["confidence"]=new{type="number",minimum=0,maximum=1},
+            ["hypotheses"]=new{type="array",minItems=1,maxItems=3,items=new{type="object",properties=new Dictionary<string,object>
+            {
+                ["ruleOrId"]=new{type="string"},["title"]=new{type="string"},["confidenceLevel"]=new{type="string",@enum=new[]{"High","Medium","Low"}},
+                ["explanation"]=new{type="string"},["evidenceCitations"]=new{type="array",items=new{type="string"}},["verificationSteps"]=new{type="array",items=new{type="string"}}
+            },required=new[]{"ruleOrId","title","confidenceLevel","explanation","evidenceCitations","verificationSteps"}}},
+            ["missingEvidence"]=new{type="array",minItems=1,maxItems=10,items=new{type="string"}},
+            ["recommendedPlaybooks"]=allowedCodes.Count==0?(object)new{type="array",maxItems=0}:new{type="array",maxItems=allowedCodes.Count,items=new{type="string",@enum=allowedCodes}}
+        },
+        required=new[]{"conclusion","confidence","hypotheses","missingEvidence","recommendedPlaybooks"}
+    };
     private static readonly JsonSerializerOptions JsonOpts = new(JsonSerializerDefaults.Web)
     {
         PropertyNameCaseInsensitive = true
@@ -96,9 +115,9 @@ public sealed class OllamaEngine(HttpClient httpClient)
             var requestBody = new
             {
                 model = config.ActiveModel,
-                prompt = $"{config.SystemPrompt}\n\nAnaliz Edilecek Cihaz Verisi:\n{job.PromptContext}\n\nLütfen yanıtını JSON formatında ver: {{ \"conclusion\": \"...\", \"confidence\": 0.85, \"hypotheses\": [ {{ \"ruleOrId\": \"...\", \"title\": \"...\", \"confidenceLevel\": \"High|Medium|Low\", \"explanation\": \"...\", \"evidenceCitations\": [\"...\"], \"verificationSteps\": [\"...\"] }} ], \"missingEvidence\": [\"...\"], \"recommendedPlaybooks\": [\"...\"] }}",
+                prompt = $"{config.SystemPrompt}\n\nAnaliz Edilecek Cihaz Verisi:\n{job.PromptContext}\n\n{ResponseInstructions}",
                 stream = false,
-                format = "json",
+                format = ResponseSchema(allowedCodes),
                 options = new { temperature = Math.Clamp(config.Temperature, 0, 1), num_predict = 1200, num_ctx = 8192 }
             };
 
@@ -130,6 +149,27 @@ public sealed class OllamaEngine(HttpClient httpClient)
         return job;
     }
 
+    internal const string ResponseInstructions=
+        "Yanıtı yalnız JSON olarak ver ve tüm metin alanlarını Türkçe yaz (hata kodları, servis ve kural adları olduğu gibi kalabilir). " +
+        "conclusion: kanıta dayalı 1-3 cümlelik özet. confidence: kanıtın gücüne göre 0 ile 1 arasında kendi tahminin; kanıt zayıf veya çelişkiliyse düşük ver, sabit bir değer kopyalama. " +
+        "hypotheses: kanıtla desteklenen en fazla 3 farklı hipotez; aynı fikri tekrarlama, öneri kimliğini hipotez yapma. ruleOrId eşleşen kural kimliği (yoksa boş), evidenceCitations kanıttaki kaynak adı ve satırı (ör. kaynak:L1; kanıt yoksa boş liste), verificationSteps operatörün yapacağı doğrulamalar. " +
+        "missingEvidence: kesin sonuç için eksik kanıtlar. recommendedPlaybooks: yalnız izin verilen öneri kimlikleri; uygun değilse boş liste.";
+
+    // Tolerates common small-model deviations ("0,7", "%85", 85) without accepting non-numeric confidence.
+    internal static bool TryReadConfidence(JsonElement value,out double confidence)
+    {
+        confidence=0;
+        if(value.ValueKind==JsonValueKind.Number)confidence=value.GetDouble();
+        else if(value.ValueKind==JsonValueKind.String)
+        {
+            var text=(value.GetString()??"").Trim().Trim('%').Replace(',','.');
+            if(!double.TryParse(text,System.Globalization.NumberStyles.Float,System.Globalization.CultureInfo.InvariantCulture,out confidence))return false;
+        }
+        else return false;
+        if(confidence>1&&confidence<=100)confidence/=100;
+        return double.IsFinite(confidence)&&confidence>=0&&confidence<=1;
+    }
+
     private static void ParseAiResponse(AiAnalysisJob job, string responseText, List<Finding> findings)
     {
         try
@@ -144,9 +184,9 @@ public sealed class OllamaEngine(HttpClient httpClient)
                 if (root.ValueKind != JsonValueKind.Object) throw new JsonException();
 
                 if (root.TryGetProperty("conclusion", out var conc)) job.Conclusion = conc.GetString() ?? "";
-                if (!root.TryGetProperty("confidence", out var conf) || conf.ValueKind != JsonValueKind.Number) throw new JsonException();
-                job.ConfidenceScore = conf.GetDouble();
-                if (!double.IsFinite(job.ConfidenceScore) || job.ConfidenceScore < 0 || job.ConfidenceScore > 1 || job.Conclusion.Length > 4000) throw new JsonException();
+                if (!root.TryGetProperty("confidence", out var conf) || !TryReadConfidence(conf, out var confidence)) throw new JsonException();
+                job.ConfidenceScore = confidence;
+                if (job.Conclusion.Length > 4000) throw new JsonException();
 
                 if (root.TryGetProperty("hypotheses", out var hypArr))
                 {
@@ -185,11 +225,9 @@ public sealed class OllamaEngine(HttpClient httpClient)
         job.Error ??= "Ollama geçerli bir analiz döndürmedi. Aşağıdaki bilgiler yalnızca yerel kurallardan gelir.";
         job.ConfidenceScore = 0;
         var hypotheses = new List<AiHypothesis>();
-        var missingEvidence = new List<string>
-        {
-            "SFC / DISM repair logs for servicing validation",
-            "Domain Controller SRV records check result"
-        };
+        // Without a model answer, the missing-evidence list comes only from the matched rules' own verification steps.
+        var missingEvidence = findings.SelectMany(f => f.NextChecks).Distinct().Take(10).ToList();
+        if (missingEvidence.Count == 0) missingEvidence.Add("Model analizi tamamlanmadığı için eksik kanıt değerlendirilmedi.");
         var recommendedPlaybooks = new List<string>();
 
         if (findings.Count > 0)

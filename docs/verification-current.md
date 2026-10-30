@@ -1,3 +1,36 @@
+# 0.7.1 doğrulaması — 30 Ekim 2026
+
+Yerel geliştirme makinesi (Windows 11, .NET 10 SDK, Ollama 0.40.13, phi4-mini:latest, 127.0.0.1:11434):
+
+| Kontrol | Sonuç |
+|---|---|
+| .NET testleri | **237/237** geçti (yeni: rota politikası/okuma uç noktası taraması, geri bildirim rol matrisi, Ollama şema/güven ayrıştırma) |
+| Playwright (yalıtılmış demo API, Chromium) | **16/16** geçti (yeni: Admin cihaz iptali ve aynı adla yeniden kayıt) |
+| Kurulum betik regresyonları | metadata, otomatik kurulum, ajan önkontrol 6/6, bağlantı önkontrolü 12/12 |
+| Gerçek model, sentetik kanıt | `Test-OllamaPipeline.ps1`: DNS (AD-001) ve BigFix (BF-001) teşhisleri `completed`; Türkçe özet, kural kimliği, kanıt atfı; öneriler PB-DNS-FLUSH / PB-BIGFIX-REPAIR; 18–40 sn |
+| Gerçek model, gerçek kanıt | Ajanın `WindowsEvidenceCollector` sınıfı bu makineden 33 kanıt topladı (olay günlüğü, ağ, işletim sistemi, BigFix); ajan API'si üzerinden gönderildi; phi4-mini gerçek olay kimliklerine atıf yapan Türkçe analiz üretti (114 sn, eşzamanlı yük altında). Gerçek ajan servisi bağlanamadı çünkü yerel geliştirme sertifikası güvenilir değil; kök sertifika deposu değiştirilmedi. |
+| Model listesi / seçimi | 6 yerel model listelendi; kurulu model seçildi, kurulu olmayan model 400 ile reddedildi |
+| Operatör geri bildirimi | Arayüzden "Çözüldü" kaydedildi (önceden 503) |
+| Tüm menüler | 9 ekran gerçek model bağlıyken hata uyarısı olmadan açıldı |
+
+**AI Kalite Laboratuvarı — phi4-mini:latest, istem 2.2.0, sentetik veri seti 1.0.0 (40 vaka × geçmişli/geçmişsiz = 80 çıkarım):**
+
+| Vaka grubu | Tüm ölçütler | Model tamamladı | İzinli öneri | Kanıt atfı | Kaçınma | Ort. süre |
+|---|---|---|---|---|---|---|
+| BigFix durdu | 8/10 | 10 | 10 | 8 | 10 | 41 sn |
+| BigFix çalışıyor | 8/10 | 10 | 10 | 8 | 10 | 45 sn |
+| DNS | 8/10 | 10 | 10 | 8 | 10 | 40 sn |
+| Disk | 7/10 | 9 | 9 | 7 | 9 | 38 sn |
+| Windows Update | 6/10 | 10 | 10 | 6 | 10 | 49 sn |
+| Kanıt yok | 9/10 | 10 | 10 | 9 | 10 | 43 sn |
+| Çelişkili kanıt | 5/10 | 10 | 10 | 5 | 10 | 42 sn |
+| İstem enjeksiyonu | 9/10 | 10 | 10 | 9 | 10 | 39 sn |
+| **Toplam** | **60/80 (%75)** | 79/80 | 79/80 | 60/80 | 79/80 | |
+
+Geçmiş deneyimli çıkarımlarda 30/40. Enjeksiyon vakalarının hiçbirinde izinsiz öneri üretilmedi (öneriler şema ile kısıtlı, sunucu ayrıca filtreler). Başarısızlıklar çoğunlukla kanıt atfı ölçütünden geliyor: model kural eşleşmesi olmayan vakalarda da ham kanıta atıf yapıyor veya atıfta kaynak adını eksik yazıyor. Bir Disk vakası zaman aşımına düştü (diğer işlerle eşzamanlı yük). Sonuç model çıktısının hipotez olduğunu gösterir; onarım yine sabit katalog, onay ve ajan doğrulamasıyla sınırlıdır.
+
+Ölçülmeyenler: gerçek Windows Server VM'de yönetici kurulumu, appwiz.cpl görünümü ve kaldırma; güvenilir sertifikayla gerçek ajan servisi; gerçek AD/LDAPS, BigFix, PostgreSQL HA ve 40.000 cihaz kapasitesi; GPU'suz sunucuda model süreleri. Sıfır hata iddiası yoktur.
+
 # 0.7.0 doğrulaması — 30 Ekim 2026
 
 Yerel geliştirme makinesinde (Windows 11, .NET 10 SDK) `scripts/Build.ps1` ve tarayıcı testleri:

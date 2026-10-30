@@ -1,3 +1,16 @@
+# 0.7.1 — 30 Ekim 2026
+
+- **Kurulum temaları:** Sunucu kurulum sihirbazı ve istemci ajan kurulum penceresi Windows uygulama temasını (aydınlık/karanlık) izleyerek açılır. Sağ üstteki **Karanlık tema / Aydınlık tema** düğmesiyle değiştirilebilir; karanlık temada başlık çubuğu da koyulaşır (Windows 10 1809+ / 11).
+- **Tanıtım sayfası:** Kurulum sihirbazı görselleri de sayfanın aydınlık/karanlık temasıyla birlikte değişir; README görselleri GitHub temasına göre seçilir.
+- **Yerel LLM:** Ollama isteği JSON şemasıyla (structured output) yapılır. Yanıt Türkçe istenir, en fazla 3 farklı hipotez, zorunlu kural kimliği ve kanıt atfı beklenir. Öneriler her istekte yalnız kanıtla eşleşen katalog kimlikleriyle sınırlanır. Güven değeri artık istemdeki örnekten kopyalanmaz; "0,7", "%85" ve 85 gibi biçimler normalize edilir. İstem sürümü 2.2.0.
+- **Model zaman aşımı:** varsayılan 120 sn yerine 240 sn (belgelenen üst sınır). GPU'suz sunucuda phi4-mini analizleri yarıda kesilmez; kurucu `Ollama:TimeoutSeconds=240` yazar. AI Kalite Laboratuvarı da aynı ayarı kullanır.
+- **Hata:** AI geri bildirimi ("Çözüldü / Çözülmedi / Geçici düzeldi") ve BigFix merkez yoklaması, kayıtlı olmayan `Analyst` yetkilendirme politikası nedeniyle her istekte HTTP 503 döndürüyordu. `Analyze` (Analyst veya Admin) politikasına bağlandı. Tüm rota tablosundaki politikaları ve parametresiz tüm okuma uç noktalarını denetleyen regresyon testleri eklendi.
+- **Hata:** Kaldırılan ajan, korunan yapılandırma nedeniyle EXE ile yeniden kurulamıyordu ("Mevcut ajan bulundu"). Ajan kurulumu artık korunan kimliği bulursa parola ve yeni kayıt istemeden aynı cihaz kimliğiyle yeniden kurar veya yükseltir.
+- **Konsol:** Cihazlar ve AI ekranında Admin için onaylı **Cihazı iptal et** düğmesi eklendi (önceden yalnız API vardı).
+- `/api/v1/ai/models` yapılandırılmış varsayılan modeli döndürür. `scripts/Test-OllamaPipeline.ps1` Windows PowerShell 5.1 ile de çalışır.
+- Doğrulama: gerçek phi4-mini ile DNS ve BigFix teşhis hattı; ajanın kendi kanıt toplayıcısıyla bu makineden toplanan 33 gerçek kanıtın sunucu ve model üzerinden analizi; AI Kalite Laboratuvarı tam koşusu. Ayrıntı: docs/verification-current.md.
+- Şema, migration ve port değişikliği yoktur.
+
 # 0.7.0 — 30 Ekim 2026
 
 - Sunucu kurulum sihirbazı: Türkçe arayüz (UTF-8 BOM), adım göstergesi, ilerleme çubuğu, İptal/Bitir ve **Konsolu aç** bağlantısı. Durum ve hata mesajları Türkçe.

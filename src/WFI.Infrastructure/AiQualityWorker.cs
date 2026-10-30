@@ -46,7 +46,7 @@ public sealed class AiQualityWorker(IServiceScopeFactory scopes,IHttpClientFacto
             var diagnostic=new DiagnosticJob{Domain="synthetic.invalid",Hostname="quality-synthetic",ProblemDescription=sample.Description,EvidenceJson=sample.EvidenceJson};
             var codes=RemediationEngine.Catalog.Where(p=>p.RuleIds.Any(id=>sample.Findings.Any(f=>f.RuleId==id))).Select(p=>p.Code).ToArray();
             var examples=history?codes.Select(code=>new LearningExample(Guid.Parse("11111111-1111-1111-1111-111111111111"),Guid.Parse("22222222-2222-2222-2222-222222222222"),code,"Synthetic prior action; current evidence must be checked.","Synthetic action check",DateTime.UnixEpoch)).ToArray():[];
-            using var client=clients.CreateClient("ollama");using var timeout=CancellationTokenSource.CreateLinkedTokenSource(ct);timeout.CancelAfter(TimeSpan.FromSeconds(120));
+            using var client=clients.CreateClient("ollama");using var timeout=CancellationTokenSource.CreateLinkedTokenSource(ct);timeout.CancelAfter(TimeSpan.FromSeconds(Math.Clamp(config.GetValue("Ollama:TimeoutSeconds",240),10,240)));
             var timer=Stopwatch.StartNew();AiAnalysisJob result;
             try {result=await new OllamaEngine(client).DiagnoseAsync(new(){BaseUrl=uri.AbsoluteUri,ActiveModel=run.Model},diagnostic,sample.Findings,"quality",timeout.Token,examples);}
             catch(OperationCanceledException)when(!ct.IsCancellationRequested){result=new(){Status="failed",RawResponse=""};}
