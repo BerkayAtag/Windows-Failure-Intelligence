@@ -32,6 +32,7 @@ public sealed class AgentStateStore(AgentConfig config)
         if(!OperatingSystem.IsWindows())throw new PlatformNotSupportedException();
         var path=Path.GetFullPath(config.StatePath);Directory.CreateDirectory(Path.GetDirectoryName(path)!);
         var bytes=ProtectedData.Protect(JsonSerializer.SerializeToUtf8Bytes(state),null,DataProtectionScope.CurrentUser);
+        if(bytes.Length>131072)throw new InvalidDataException("Agent state exceeds size limit; previous journal preserved.");
         var temp=path+".new";
         await using(var file=new FileStream(temp,FileMode.Create,FileAccess.Write,FileShare.None,4096,FileOptions.WriteThrough))
         {

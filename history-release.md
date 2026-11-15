@@ -1,3 +1,12 @@
+## WFI 0.7.2 — 15 Kasım 2026
+
+- Ajanın aşırı büyük durum kaydı, önceki kurtarılabilir kaydı artık ezmez.
+- Geliştirme betikleri standart Windows SDK dizinlerini ve DOTNET_ROOT ayarlarını bulur.
+- Demo başlatıcısı çalışma dizinini geri yükler ve geçersiz portları reddeder.
+- Tanıtım sayfasının mevcut tasarımı korunmuştur.
+
+Doğrulama ve ortam sınırları: [güncel test raporu](https://github.com/BerkayAtag/Windows-Failure-Intelligence/blob/main/docs/verification-current.md).
+
 # 0.7.1 — 30 Ekim 2026
 
 - **Kurulum temaları:** Sunucu kurulum sihirbazı ve istemci ajan kurulum penceresi Windows uygulama temasını (aydınlık/karanlık) izleyerek açılır. Sağ üstteki **Karanlık tema / Aydınlık tema** düğmesiyle değiştirilebilir; karanlık temada başlık çubuğu da koyulaşır (Windows 10 1809+ / 11).

@@ -1,3 +1,12 @@
+## WFI 0.7.2 — 15 Kasım 2026
+
+- Ajanın aşırı büyük durum kaydı, önceki kurtarılabilir kaydı artık ezmez.
+- Geliştirme betikleri standart Windows SDK dizinlerini ve DOTNET_ROOT ayarlarını bulur.
+- Demo başlatıcısı çalışma dizinini geri yükler ve geçersiz portları reddeder.
+- Tanıtım sayfasının mevcut tasarımı korunmuştur.
+
+Doğrulama ve ortam sınırları: [güncel test raporu](https://github.com/BerkayAtag/Windows-Failure-Intelligence/blob/main/docs/verification-current.md).
+
 ## WFI 0.7.1 — Windows Failure Intelligence
 
 Windows uç noktalarında kanıta dayalı teşhis, kurum içi yapay zekâ (Ollama) ve onaylı katalogla kontrollü onarım.

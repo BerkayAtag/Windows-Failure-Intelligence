@@ -15,3 +15,4 @@ artifacts/
 **/wwwroot/assets/
 **/wwwroot/index.html
 *.tsbuildinfo
+**/wwwroot/wfi.svg

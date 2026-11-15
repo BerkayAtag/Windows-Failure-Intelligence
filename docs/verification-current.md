@@ -1,3 +1,15 @@
+# 0.7.2 doğrulaması — 15 Kasım 2026
+
+Bu çalışma Windows geliştirme makinesinde yürütülmektedir. Önceki sürümün aşağıdaki ölçümleri bu sürüm için tekrar yapılmış kabul edilmemelidir.
+
+- .NET regresyonları: 238/238 geçti; büyük ajan durum kaydının eski kaydı koruması dahil.
+- Web TypeScript/Vite üretim derlemesi geçti.
+- Kurulum metadata, otomatik kurulum, ajan önkontrol ve bağlantı doğrulama kontrolleri geçti.
+- pnpm bağımlılık taramasında bilinen açık bulunmadı.
+- Chromium uçtan uca testleri: 16/16 geçti (48,5 saniye). Giriş, roller, kanıt yükleme, cihaz kaydı/iptali, teşhis, kampanya, ajan indirme, tema ve mobil görünüm dahil.
+- Tam Build.ps1 tamamlandı; sunucu EXE sürümü 0.7.2.0. .NET bağımlılık taraması temiz; EF migration modeli güncel.
+- Gerçek Windows Server kurulumu/kaldırması, AD/LDAPS, BigFix, PostgreSQL HA ve gerçek cihaz kapasitesi bu çalışmada doğrulanmadı. Tam Windows uyumluluğu veya sıfır hata garantisi verilmez.
+
 # 0.7.1 doğrulaması — 30 Ekim 2026
 
 Yerel geliştirme makinesi (Windows 11, .NET 10 SDK, Ollama 0.40.13, phi4-mini:latest, 127.0.0.1:11434):

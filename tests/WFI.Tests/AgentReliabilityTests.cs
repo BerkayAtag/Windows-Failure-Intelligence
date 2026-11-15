@@ -6,6 +6,25 @@ using Xunit;
 namespace WFI.Tests;
 public sealed class AgentReliabilityTests
 {
+    [Fact]
+    public async Task OversizedJournalDoesNotReplaceRecoverableState()
+    {
+        if(!OperatingSystem.IsWindows())return;
+        var directory=Path.Combine(Path.GetTempPath(),"wfi-journal-size-"+Guid.NewGuid().ToString("N"));
+        try
+        {
+            var config=new AgentConfig{DeviceId=Guid.NewGuid(),StatePath=Path.Combine(directory,"state.bin")};
+            var store=new AgentStateStore(config);
+            var state=new AgentState{DeviceId=config.DeviceId,ServerUrl=config.ServerUrl};
+            await store.SaveAsync(state,default);
+            var before=await File.ReadAllBytesAsync(config.StatePath);
+            state.PendingReceipt=new(Guid.NewGuid(),false,"",new string('x',131072),"");
+            await Assert.ThrowsAsync<InvalidDataException>(()=>store.SaveAsync(state,default));
+            Assert.Equal(before,await File.ReadAllBytesAsync(config.StatePath));
+            Assert.Null((await store.LoadAsync(default)).PendingReceipt);
+        }
+        finally {if(Directory.Exists(directory))Directory.Delete(directory,true);}
+    }
     [Theory]
     [InlineData("https://wfi.example.invalid",true)]
     [InlineData("https://wfi.example.invalid:8443/",true)]

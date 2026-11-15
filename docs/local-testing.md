@@ -1,6 +1,6 @@
 # Son sürümü yerel olarak deneme
 
-## 0.6 geliştirme ekranını deneme
+## Güncel geliştirme ekranını deneme
 
 Proje kökünde `./scripts/Build.ps1`, ardından `./scripts/Start-Demo.ps1` çalıştırın. http://127.0.0.1:5080 adresinde **Demoyu aç** seçin. Analiz merkezi makine + sorun açıklaması alır. Demo gerçek kurumsal makinelere erişmez: cihazın kaydı ve çalışan HTTPS ajanı olmadan iş “Ajan bağlantısı bekleniyor” durumunda kalır; bu durum hata gizleme veya başarılı teşhis değildir. Ajan ve Ağ Erişimleri menüsünden EXE indirme, sessiz komut ve ağ kuralları; AI Deneyimleri menüsünden geçmiş örnekler incelenebilir. Cihaz kaydı ve politika ayarları Cihazlar ve AI menüsündedir. Gerçek makine kabulü için sunucu/istemci kurulum belgelerini izleyin.
 

@@ -5,7 +5,7 @@
 <p align="center"><b>Windows sorunlarını kanıtla çözün.</b> Yerel yapay zekâ · Kontrollü onarım · Tek konsol</p>
 
 <p align="center">
-  <a href="https://github.com/BerkayAtag/Windows-Failure-Intelligence/releases/latest/download/WFI-Server-Setup.exe"><b>Sunucu kurulumunu indir (0.7.1)</b></a> ·
+  <a href="https://github.com/BerkayAtag/Windows-Failure-Intelligence/releases/latest/download/WFI-Server-Setup.exe"><b>Sunucu kurulumunu indir (0.7.2)</b></a> ·
   <a href="https://berkayatag.github.io/Windows-Failure-Intelligence/">Tanıtım sayfası</a> ·
   <a href="docs/server-installation.md">Sunucu kurulumu</a> ·
   <a href="docs/client-installation.md">İstemci kurulumu</a> ·
@@ -34,7 +34,7 @@ Makineyi seçin, sorunu anlatın. WFI ajanı kanıtları toplar, sunucudaki yere
 |---|---|
 | <picture><source media="(prefers-color-scheme: dark)" srcset="site/assets/setup-wizard-dark.png"><img src="site/assets/setup-wizard.png" alt="Kurulum sihirbazı ayarlar adımı" width="420"></picture> | <picture><source media="(prefers-color-scheme: dark)" srcset="site/assets/setup-finish-dark.png"><img src="site/assets/setup-finish.png" alt="Kurulum tamamlandı ekranı" width="420"></picture> |
 
-Kurulum sihirbazı ve ajan kurulumu Windows temanızı izler (aydınlık/karanlık, düğmeyle değiştirilebilir). Programlar ve Özellikler'de **WFI Server**, yayıncı **Berkay Atağ**, sürüm **0.7.1** ve kırmızı WFI simgesi görünür. İlk kurulum internetten birkaç GB indirir. Yarıda kalırsa (ör. yeniden başlatma gerekirse) kurucuyu aynı ayarlarla tekrar çalıştırın; tamamlanan adımlar tekrarlanmaz. Ayrıntı: [sunucu kurulumu](docs/server-installation.md).
+Kurulum sihirbazı ve ajan kurulumu Windows temanızı izler (aydınlık/karanlık, düğmeyle değiştirilebilir). Programlar ve Özellikler'de **WFI Server**, yayıncı **Berkay Atağ**, sürüm **0.7.2** ve kırmızı WFI simgesi görünür. İlk kurulum internetten birkaç GB indirir. Yarıda kalırsa (ör. yeniden başlatma gerekirse) kurucuyu aynı ayarlarla tekrar çalıştırın; tamamlanan adımlar tekrarlanmaz. Ayrıntı: [sunucu kurulumu](docs/server-installation.md).
 
 **İstemci ajanı** GitHub'da ayrı dosya olarak yayımlanmaz: konsolda **Ajan ve Ağ Erişimleri → Windows ajanını indir** ile tek EXE alınır. Ek ön koşul yoktur (Windows PowerShell 5.1 yeterli); makine Admin hesabıyla otomatik kaydolur. Ayrıntı: [istemci kurulumu](docs/client-installation.md).
 
@@ -81,7 +81,7 @@ Demo yalnız sentetik veri içindir. Üretimde şema kurulum sırasında uygulan
 
 ## Doğrulama ve sınırlar
 
-0.7.1 sonuçları ve açık kabul maddeleri: [doğrulama](docs/verification-current.md), [kabul matrisi](docs/acceptance-matrix.md). EXE'ler Authenticode imzalı değildir; yayıncı adı Programlar ve Özellikler kaydıdır. Gerçek Windows Server VM kurulum/kaldırma, gerçek AD/BigFix, HA ve 40.000 cihaz kapasitesi bu sürümde ölçülmedi; sıfır hata veya güvenlik açığı iddiası yoktur. Önceki sürüm notları: [arşiv](docs/release-notes-archive.md).
+0.7.2 sonuçları ve açık kabul maddeleri: [doğrulama](docs/verification-current.md), [kabul matrisi](docs/acceptance-matrix.md). EXE'ler Authenticode imzalı değildir; yayıncı adı Programlar ve Özellikler kaydıdır. Gerçek Windows Server VM kurulum/kaldırma, gerçek AD/BigFix, HA ve 40.000 cihaz kapasitesi bu sürümde ölçülmedi; sıfır hata veya güvenlik açığı iddiası yoktur. Önceki sürüm notları: [arşiv](docs/release-notes-archive.md).
 
 ---
 
